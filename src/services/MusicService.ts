@@ -1,4 +1,4 @@
-import { zing } from "zingmp3-api-next";
+// import { zing } from "zingmp3-api-next";
 import { ZingMp3 } from "./index";
 import axios from "axios";
 
@@ -94,8 +94,8 @@ async function search(keyword: string) {
 }
 
 async function getSuggest(keyword: string) {
-  const data = await zing.get_suggestion_keyword(keyword);
-  return data;
+  // const data = await zing.get_suggestion_keyword(keyword);
+  // return data;
 }
 async function getSongBackground(songId: string) {
   const data = await ZingMp3.getLyric(songId);
