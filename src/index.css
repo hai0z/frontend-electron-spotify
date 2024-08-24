@@ -1,0 +1,54 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+* {
+  user-select: none;
+}
+.full-screen-lyric::-webkit-scrollbar {
+  display: none;
+}
+.full-screen-lyric {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.drag {
+  cursor: grab;
+  -webkit-app-region: drag;
+}
+html {
+  scrollbar-gutter: stable;
+  scrollbar-width: none;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+.spin {
+  animation: spin 60s linear infinite;
+}
+
+.contexify_theme-abc {
+  --contexify-menu-bgColor: oklch(var(--b3));
+  --contexify-separator-color: #4c4c4c;
+  --contexify-item-color: oklch(var(--bc));
+  --contexify-activeItem-color: oklch(var(--pc));
+  --contexify-activeItem-bgColor: oklch(var(--p));
+  --contexify-rightSlot-color: #6f6e77;
+  --contexify-activeRightSlot-color: #fff;
+  --contexify-arrow-color: #6f6e77;
+  --contexify-activeArrow-color: #fff;
+}
+.order {
+  opacity: 0.4;
+  -webkit-text-stroke: 1px oklch(var(--bc));
+  font-size: 40px;
+  font-weight: 900;
+  color: transparent;
+  line-height: 1;
+  font-family: "Roboto", sans-serif;
+}
