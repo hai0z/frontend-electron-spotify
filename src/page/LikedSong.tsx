@@ -237,7 +237,7 @@ const LikedSongPage = () => {
                 key={pl.encodeId}
                 className="flex flex-row justify-between items-center  hover:bg-base-300 py-3 rounded-md group cursor-pointer my-2"
               >
-                <div className="flex flex-row items-center flex-[2] mr-4 ">
+                <div className="flex flex-row items-center flex-[2]">
                   <div className="mr-3 font-bold  w-12 justify-center items-center flex h-12">
                     {currentSong?.encodeId == pl.encodeId && isPlaying ? (
                       <Lottie loop animationData={playingAnimation} />

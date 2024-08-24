@@ -21,8 +21,9 @@ import { useUserStore } from "../store/UserStore";
 import { GREEN } from "../constants";
 import { addToLikedPlaylist } from "../services/firebase";
 import stringToSlug from "../utils/removeSign";
-import { IoMdArrowDropup, IoMdArrowDropdown } from "react-icons/io";
-const PlaylistPage = () => {
+import { IoIosClose } from "react-icons/io";
+
+const PlaylistComponent = ({ data }: { data: any }) => {
   const { isPlaying, currentSong, playlist, setIsPlaying } =
     useTrackPlayerStore();
 
@@ -37,17 +38,17 @@ const PlaylistPage = () => {
   const likedPlaylistsIncluded = likedPlaylists.some(
     (pl: any) => pl.encodeId == id
   );
-  const { data, isFetching } = useQuery({
-    queryKey: ["playlist", id],
-    queryFn: async () => {
-      const data = await getDetailPlaylist(id!);
-      setSearchResult(data);
-      const vibrantColorRes = await getImageColor(data?.data?.thumbnailM);
-      setVibrantColor(vibrantColorRes as string);
-      return data;
-    },
-    refetchOnWindowFocus: false,
-  });
+  // const { data, isFetching } = useQuery({
+  //   queryKey: ["playlist", id],
+  //   queryFn: async () => {
+  //     const data = await getDetailPlaylist(id!);
+  //     setSearchResult(data);
+  //     const vibrantColorRes = await getImageColor(data?.data?.thumbnailM);
+  //     setVibrantColor(vibrantColorRes as string);
+  //     return data;
+  //   },
+  //   refetchOnWindowFocus: false,
+  // });
 
   const gradientColor = useImageColor(vibrantColor, 35);
 
@@ -104,48 +105,17 @@ const PlaylistPage = () => {
     };
   }, [vibrantColor]);
 
+  ///////////////////////
   const [searchResult, setSearchResult] = useState<any>({});
   const [searchQuery, setSearchQuery] = useState("");
+
   const [showSearchInput, setShowSearchInput] = useState(false);
-  const [sort, setSort] = useState({
-    type: "title",
+
+  const [filterCondition, setFilterCondition] = useState({
     sort: "asc",
+    type: "title",
   });
 
-  const toggleSort = (type: string) => {
-    if (sort.type == type) {
-      setSort({
-        ...sort,
-        sort: sort.sort == "asc" ? "desc" : "asc",
-      });
-    } else {
-      setSort({
-        type: type,
-        sort: "asc",
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (sort.type === "title") {
-      setSearchResult({
-        ...searchResult,
-        data: {
-          ...searchResult?.data,
-          song: {
-            ...searchResult?.data?.song,
-            items: searchResult?.data?.song?.items?.sort((a: any, b: any) => {
-              if (sort.sort == "asc") {
-                return stringToSlug(a.title) > stringToSlug(b.title) ? 1 : -1;
-              } else {
-                return stringToSlug(a.title) < stringToSlug(b.title) ? 1 : -1;
-              }
-            }),
-          },
-        },
-      });
-    }
-  }, [sort]);
   useEffect(() => {
     if (searchQuery.trim().length <= 0) {
       setSearchResult(data);
@@ -165,13 +135,14 @@ const PlaylistPage = () => {
       });
     }
   }, [searchQuery]);
-  if (isFetching) {
-    return (
-      <div className="flex justify-center items-center h-full w-full">
-        <span className="loading loading-dots loading-lg text-primary"></span>
-      </div>
-    );
-  }
+  /////////
+  // if (isFetching) {
+  //   return (
+  //     <div className="flex justify-center items-center h-full w-full">
+  //       <span className="loading loading-dots loading-lg text-primary"></span>
+  //     </div>
+  //   );
+  // }
   return (
     <div className="w-full pb-4 rounded-md overflow-y-scroll mx-2 bg-base-200">
       <Header
@@ -282,7 +253,7 @@ const PlaylistPage = () => {
               />
             </div>
           </div>
-          <div className="flex flex-row items-center ">
+          <div className="flex flex-row items-center">
             <motion.div className="relative w-64 flex justify-center items-center mt-2 ml-auto mr-4">
               <motion.input
                 type="text"
@@ -304,7 +275,6 @@ const PlaylistPage = () => {
                 <motion.svg
                   onClick={() => {
                     setShowSearchInput(!showSearchInput);
-                    setSearchQuery("");
                   }}
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
@@ -338,17 +308,7 @@ const PlaylistPage = () => {
                 <span>#</span>
               </p>
             </div>
-            <div
-              className="flex cursor-pointer"
-              onClick={() => toggleSort("title")}
-            >
-              <p className="ml-3">Tiêu đề</p>
-              {sort.type === "title" && sort.sort === "asc" ? (
-                <IoMdArrowDropdown size="24" color="oklch(var(--bc))" />
-              ) : (
-                <IoMdArrowDropup size="24" color="oklch(var(--bc))" />
-              )}
-            </div>
+            <p className="ml-3">Tiêu đề</p>
           </div>
           <div className="flex flex-1">
             <p className="">Album</p>
@@ -370,7 +330,7 @@ const PlaylistPage = () => {
                   key={pl.encodeId}
                   className="flex flex-row justify-between items-center  hover:bg-base-300 py-3 rounded-md group cursor-pointer my-2"
                 >
-                  <div className="flex flex-row items-center flex-[2]">
+                  <div className="flex flex-row items-center flex-[2] mr-4 ">
                     <div className="mr-3 font-bold  w-12 justify-center items-center flex h-12">
                       {currentSong?.encodeId == pl.encodeId && isPlaying ? (
                         <Lottie
@@ -467,4 +427,4 @@ const PlaylistPage = () => {
   );
 };
 
-export default PlaylistPage;
+export default PlaylistComponent;

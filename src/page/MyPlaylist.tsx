@@ -17,6 +17,8 @@ import { getImageColor } from "../utils/getImageColor";
 import Loading from "../components/Loading";
 import { useAppSettingStore } from "../store/AppSettingStore";
 import { useAppContext } from "../context/AppProvider";
+import dayjs from "dayjs";
+import stringToSlug from "../utils/removeSign";
 const MyPlaylist = () => {
   const { isPlaying, currentSong, setIsPlaying, playlist } =
     useTrackPlayerStore();
@@ -112,6 +114,61 @@ const MyPlaylist = () => {
     getVibrantColor();
   }, [id]);
 
+  const [searchResult, setSearchResult] = useState<any>({});
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearchInput, setShowSearchInput] = useState(false);
+  const [sort, setSort] = useState({
+    type: "title",
+    sort: "asc",
+  });
+
+  const toggleSort = (type: string) => {
+    if (sort.type == type) {
+      setSort({
+        ...sort,
+        sort: sort.sort == "asc" ? "desc" : "asc",
+      });
+    } else {
+      setSort({
+        type: type,
+        sort: "asc",
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (sort.type === "title") {
+      setSearchResult({
+        ...searchResult,
+        data: {
+          ...searchResult?.data,
+          song: {
+            ...searchResult?.data?.song,
+            items: searchResult?.data?.song?.items?.sort((a: any, b: any) => {
+              if (sort.sort == "asc") {
+                return stringToSlug(a.title) > stringToSlug(b.title) ? 1 : -1;
+              } else {
+                return stringToSlug(a.title) < stringToSlug(b.title) ? 1 : -1;
+              }
+            }),
+          },
+        },
+      });
+    }
+  }, [sort]);
+  useEffect(() => {
+    if (searchQuery.trim().length <= 0) {
+      setSearchResult(data);
+    } else {
+      const result = data?.songs?.filter((item: any) => {
+        return stringToSlug(item.title).includes(stringToSlug(searchQuery));
+      });
+      setSearchResult({
+        ...data,
+        songs: result,
+      });
+    }
+  }, [searchQuery]);
   if (loading) {
     return <Loading />;
   }
@@ -196,15 +253,65 @@ const MyPlaylist = () => {
         }}
       ></div>
       <div className="-mt-64 pt-6">
-        <div
-          className="bg-primary w-[55px] h-[55px] cursor-pointer rounded-full  shadow-md justify-center flex items-center ml-4 transition-all duration-300 hover:scale-105"
-          onClick={handleButtonPlay}
-        >
-          {isPlaying && playlist.encodeId == data?.data?.encodeId ? (
-            <BsFillPauseFill className="text-[28px]" color="oklch(var(--pc))" />
-          ) : (
-            <BsFillPlayFill className="text-[28px]" color="oklch(var(--pc))" />
-          )}
+        <div className="flex flex-row items-center  justify-between">
+          <div className="flex flex-row items-center gap-4">
+            <div
+              className="bg-primary w-[55px] h-[55px] cursor-pointer rounded-full  shadow-md justify-center flex items-center ml-4 transition-all duration-300 hover:scale-105"
+              onClick={handleButtonPlay}
+            >
+              {isPlaying && playlist.encodeId == data?.encodeId ? (
+                <BsFillPauseFill
+                  className="text-[28px]"
+                  color="oklch(var(--pc))"
+                />
+              ) : (
+                <BsFillPlayFill
+                  className="text-[28px]"
+                  color="oklch(var(--pc))"
+                />
+              )}
+            </div>
+          </div>
+          <div className="flex flex-row items-center ">
+            <motion.div className="relative w-64 flex justify-center items-center mt-2 ml-auto mr-4">
+              <motion.input
+                type="text"
+                placeholder={
+                  showSearchInput ? "Nhập tên bài hát cần tìm..." : ""
+                }
+                value={searchQuery}
+                className={
+                  showSearchInput
+                    ? "w-64 rounded-md outline-none input input-sm -right-0 focus:ring-2 pl-3 ring-primary hover:ring-2 absolute transition-all duration-1000"
+                    : "w-6 absolute transition-all duration-1000 pl-3 -right-0 rounded-full bg-inherit input input-sm"
+                }
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                }}
+              />
+
+              <div className="cursor-pointer absolute hover:bg-base-200 rounded-full right-0 p-1">
+                <motion.svg
+                  onClick={() => {
+                    setShowSearchInput(!showSearchInput);
+                    setSearchQuery("");
+                  }}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-6 h-6 "
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  />
+                </motion.svg>
+              </div>
+            </motion.div>
+          </div>
         </div>
         <div
           ref={stickyRef}
@@ -226,12 +333,15 @@ const MyPlaylist = () => {
           <div className="flex flex-1">
             <p className="">Album</p>
           </div>
+          <div className="flex flex-1 justify-center">
+            <p className="text-center">Ngày thêm</p>
+          </div>
           <div className="flex flex-[0.5] justify-center items-center">
             <Clock size="24" color="oklch(var(--bc))" />
           </div>
         </div>
         <div className="px-4 mt-4">
-          {data?.songs?.map((pl: any, index: number) => {
+          {searchResult?.songs?.map((pl: any, index: number) => {
             return (
               <motion.div
                 onContextMenu={(e) => {
@@ -241,7 +351,7 @@ const MyPlaylist = () => {
                 key={pl.encodeId}
                 className="flex flex-row justify-between items-center  hover:bg-base-300 py-3 rounded-md group cursor-pointer my-2"
               >
-                <div className="flex flex-row items-center flex-[2] mr-4 ">
+                <div className="flex flex-row items-center flex-[2] ">
                   <div className="mr-3 font-bold  w-12 justify-center items-center flex h-12">
                     {currentSong?.encodeId == pl.encodeId && isPlaying ? (
                       <Lottie loop animationData={playingAnimation} />
@@ -316,6 +426,11 @@ const MyPlaylist = () => {
                       {pl.album?.title || pl.title}
                     </span>
                   )}
+                </div>
+                <div className="flex-1 flex-wrap">
+                  <p className="text-center">
+                    {dayjs(pl.timestamp).format("DD/MM/YYYY")}
+                  </p>
                 </div>
                 <div className="flex-[0.5] flex justify-center items-center">
                   <span className="font-normal text-base-content/80">
