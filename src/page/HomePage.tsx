@@ -46,7 +46,7 @@ const HomePage = () => {
     if (hour < 12) {
       return "Chào buổi sáng";
     } else if (hour < 18) {
-      return "Chào buổi chiều";
+      return "Chào buổi chiềux";
     } else {
       return "Chào buổi tối";
     }
