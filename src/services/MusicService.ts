@@ -93,7 +93,7 @@ async function search(keyword: string) {
   return data.data;
 }
 
-async function getSuggest(keyword: string) {
+async function getSuggest(_: string) {
   // const data = await zing.get_suggestion_keyword(keyword);
   // return data;
 }
