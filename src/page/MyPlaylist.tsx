@@ -117,24 +117,24 @@ const MyPlaylist = () => {
   const [searchResult, setSearchResult] = useState<any>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchInput, setShowSearchInput] = useState(false);
-  const [sort, setSort] = useState({
+  const [sort] = useState({
     type: "title",
     sort: "asc",
   });
 
-  const toggleSort = (type: string) => {
-    if (sort.type == type) {
-      setSort({
-        ...sort,
-        sort: sort.sort == "asc" ? "desc" : "asc",
-      });
-    } else {
-      setSort({
-        type: type,
-        sort: "asc",
-      });
-    }
-  };
+  // const toggleSort = (type: string) => {
+  //   if (sort.type == type) {
+  //     setSort({
+  //       ...sort,
+  //       sort: sort.sort == "asc" ? "desc" : "asc",
+  //     });
+  //   } else {
+  //     setSort({
+  //       type: type,
+  //       sort: "asc",
+  //     });
+  //   }
+  // };
 
   useEffect(() => {
     if (sort.type === "title") {
