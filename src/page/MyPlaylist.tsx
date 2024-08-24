@@ -19,6 +19,7 @@ import { useAppSettingStore } from "../store/AppSettingStore";
 import { useAppContext } from "../context/AppProvider";
 import dayjs from "dayjs";
 import stringToSlug from "../utils/removeSign";
+import { IoMdArrowDropdown, IoMdArrowDropup } from "react-icons/io";
 const MyPlaylist = () => {
   const { isPlaying, currentSong, setIsPlaying, playlist } =
     useTrackPlayerStore();
@@ -100,7 +101,6 @@ const MyPlaylist = () => {
   useEffect(() => {
     const getVibrantColor = async () => {
       setLoading(true);
-
       const vibrantColorRes = await getImageColor(
         data?.songs?.length > 0
           ? data?.songs.at(-1).thumbnailM
@@ -109,6 +109,12 @@ const MyPlaylist = () => {
       setVibrantColor(vibrantColorRes as string);
       setTimeout(() => {
         setLoading(false);
+        setSearchQuery("");
+        setSearchResult(data);
+        setSort({
+          type: "title",
+          sort: "asc",
+        });
       }, 500);
     };
     getVibrantColor();
@@ -117,50 +123,56 @@ const MyPlaylist = () => {
   const [searchResult, setSearchResult] = useState<any>({});
   const [searchQuery, setSearchQuery] = useState("");
   const [showSearchInput, setShowSearchInput] = useState(false);
-  const [sort] = useState({
+  const [sort, setSort] = useState({
     type: "title",
     sort: "asc",
   });
 
-  // const toggleSort = (type: string) => {
-  //   if (sort.type == type) {
-  //     setSort({
-  //       ...sort,
-  //       sort: sort.sort == "asc" ? "desc" : "asc",
-  //     });
-  //   } else {
-  //     setSort({
-  //       type: type,
-  //       sort: "asc",
-  //     });
-  //   }
-  // };
+  const toggleSort = (type: string) => {
+    if (sort.type == type) {
+      setSort({
+        ...sort,
+        sort: sort.sort == "asc" ? "desc" : "asc",
+      });
+    } else {
+      setSort({
+        type: type,
+        sort: "asc",
+      });
+    }
+  };
 
   useEffect(() => {
     if (sort.type === "title") {
       setSearchResult({
         ...searchResult,
-        data: {
-          ...searchResult?.data,
-          song: {
-            ...searchResult?.data?.song,
-            items: searchResult?.data?.song?.items?.sort((a: any, b: any) => {
-              if (sort.sort == "asc") {
-                return stringToSlug(a.title) > stringToSlug(b.title) ? 1 : -1;
-              } else {
-                return stringToSlug(a.title) < stringToSlug(b.title) ? 1 : -1;
-              }
-            }),
-          },
-        },
+        songs: searchResult?.songs?.sort((a: any, b: any) => {
+          if (sort.sort == "asc") {
+            return stringToSlug(a.title).localeCompare(stringToSlug(b.title));
+          } else {
+            return stringToSlug(b.title).localeCompare(stringToSlug(a.title));
+          }
+        }),
+      });
+    }
+    if (sort.type === "date") {
+      setSearchResult({
+        ...searchResult,
+        songs: searchResult?.songs?.sort((a: any, b: any) => {
+          if (sort.sort == "asc") {
+            return dayjs(a.timestamp).valueOf() - dayjs(b.timestamp).valueOf();
+          } else {
+            return dayjs(b.timestamp).valueOf() - dayjs(a.timestamp).valueOf();
+          }
+        }),
       });
     }
   }, [sort]);
   useEffect(() => {
     if (searchQuery.trim().length <= 0) {
-      setSearchResult(data);
+      setSearchResult({ ...data });
     } else {
-      const result = data?.songs?.filter((item: any) => {
+      const result = [...data?.songs].filter((item: any) => {
         return stringToSlug(item.title).includes(stringToSlug(searchQuery));
       });
       setSearchResult({
@@ -328,13 +340,35 @@ const MyPlaylist = () => {
                 <span>#</span>
               </p>
             </div>
-            <p className="ml-3">Title</p>
+            <div
+              className="flex cursor-pointer"
+              onClick={() => toggleSort("title")}
+            >
+              <p className="ml-3">Tiêu đề</p>
+              {sort.type === "title" &&
+                (sort.sort === "asc" ? (
+                  <IoMdArrowDropdown size="24" color="oklch(var(--p))" />
+                ) : (
+                  <IoMdArrowDropup size="24" color="oklch(var(--p))" />
+                ))}
+            </div>
           </div>
           <div className="flex flex-1">
             <p className="">Album</p>
           </div>
           <div className="flex flex-1 justify-center">
-            <p className="text-center">Ngày thêm</p>
+            <div
+              className="flex cursor-pointer"
+              onClick={() => toggleSort("date")}
+            >
+              <p className="text-center">Ngày thêm</p>
+              {sort.type === "date" &&
+                (sort.sort === "asc" ? (
+                  <IoMdArrowDropdown size="24" color="oklch(var(--p))" />
+                ) : (
+                  <IoMdArrowDropup size="24" color="oklch(var(--p))" />
+                ))}
+            </div>
           </div>
           <div className="flex flex-[0.5] justify-center items-center">
             <Clock size="24" color="oklch(var(--bc))" />

@@ -344,9 +344,9 @@ const PlaylistPage = () => {
             >
               <p className="ml-3">Tiêu đề</p>
               {sort.type === "title" && sort.sort === "asc" ? (
-                <IoMdArrowDropdown size="24" color="oklch(var(--bc))" />
+                <IoMdArrowDropdown size="24" color="oklch(var(--p))" />
               ) : (
-                <IoMdArrowDropup size="24" color="oklch(var(--bc))" />
+                <IoMdArrowDropup size="24" color="oklch(var(--p))" />
               )}
             </div>
           </div>

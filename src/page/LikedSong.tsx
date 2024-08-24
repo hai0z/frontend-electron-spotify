@@ -18,6 +18,7 @@ import Loading from "../components/Loading";
 import { DEFAULT_IMG } from "../constants";
 import { useAppContext } from "../context/AppProvider";
 import { useAppSettingStore } from "../store/AppSettingStore";
+import stringToSlug from "../utils/removeSign";
 const LikedSongPage = () => {
   const { isPlaying, currentSong, setIsPlaying, playlist } =
     useTrackPlayerStore();
@@ -30,7 +31,7 @@ const LikedSongPage = () => {
 
   const { id } = useParams();
 
-  const data = likedSongs;
+  const data = [...likedSongs];
 
   const [vibrantColor, setVibrantColor] = useState("transparent");
 
@@ -104,10 +105,29 @@ const LikedSongPage = () => {
       setVibrantColor(vibrantColorRes as string);
       setTimeout(() => {
         setLoading(false);
+        setSearchQuery("");
+        setSearchResult(data);
       }, 500);
     };
     getVibrantColor();
   }, [id]);
+
+  const [searchResult, setSearchResult] = useState<any>([]);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const [showSearchInput, setShowSearchInput] = useState(false);
+
+  useEffect(() => {
+    if (searchQuery.trim().length <= 0) {
+      setSearchResult([...data]);
+    } else {
+      const result = [...data]?.filter((item: any) => {
+        return stringToSlug(item.title).includes(stringToSlug(searchQuery));
+      });
+      setSearchResult(result);
+    }
+  }, [searchQuery]);
 
   if (loading) {
     return <Loading />;
@@ -192,15 +212,65 @@ const LikedSongPage = () => {
         }}
       ></div>
       <div className="-mt-64 pt-6">
-        <div
-          className="bg-primary w-[55px] h-[55px] cursor-pointer rounded-full  shadow-md justify-center flex items-center ml-4 transition-all duration-300 hover:scale-105"
-          onClick={handleButtonPlay}
-        >
-          {isPlaying && playlist.encodeId == "likedSongs" ? (
-            <BsFillPauseFill className="text-[28px]" color="oklch(var(--pc))" />
-          ) : (
-            <BsFillPlayFill className="text-[28px]" color="oklch(var(--pc))" />
-          )}
+        <div className="flex flex-row items-center  justify-between">
+          <div className="flex flex-row items-center gap-4">
+            <div
+              className="bg-primary w-[55px] h-[55px] cursor-pointer rounded-full  shadow-md justify-center flex items-center ml-4 transition-all duration-300 hover:scale-105"
+              onClick={handleButtonPlay}
+            >
+              {isPlaying && playlist.encodeId == "likedSongs" ? (
+                <BsFillPauseFill
+                  className="text-[28px]"
+                  color="oklch(var(--pc))"
+                />
+              ) : (
+                <BsFillPlayFill
+                  className="text-[28px]"
+                  color="oklch(var(--pc))"
+                />
+              )}
+            </div>
+          </div>
+          <div className="flex flex-row items-center ">
+            <motion.div className="relative w-64 flex justify-center items-center mt-2 ml-auto mr-4">
+              <motion.input
+                type="text"
+                placeholder={
+                  showSearchInput ? "Nhập tên bài hát cần tìm..." : ""
+                }
+                value={searchQuery}
+                className={
+                  showSearchInput
+                    ? "w-64 rounded-md outline-none input input-sm -right-0 focus:ring-2 pl-3 ring-primary hover:ring-2 absolute transition-all duration-1000"
+                    : "w-6 absolute transition-all duration-1000 pl-3 -right-0 rounded-full bg-inherit input input-sm"
+                }
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                }}
+              />
+
+              <div className="cursor-pointer absolute hover:bg-base-200 rounded-full right-0 p-1">
+                <motion.svg
+                  onClick={() => {
+                    setShowSearchInput(!showSearchInput);
+                    setSearchQuery("");
+                  }}
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth="1.5"
+                  stroke="currentColor"
+                  className="w-6 h-6 "
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  />
+                </motion.svg>
+              </div>
+            </motion.div>
+          </div>
         </div>
         <div
           ref={stickyRef}
@@ -217,7 +287,7 @@ const LikedSongPage = () => {
                 <span>#</span>
               </p>
             </div>
-            <p className="ml-3">Title</p>
+            <p className="ml-3">Tiêu đề</p>
           </div>
           <div className="flex flex-1">
             <p className="">Album</p>
@@ -227,7 +297,7 @@ const LikedSongPage = () => {
           </div>
         </div>
         <div className="px-4 mt-4">
-          {data?.map((pl: any, index: number) => {
+          {searchResult?.map((pl: any, index: number) => {
             return (
               <motion.div
                 onContextMenu={(e) => {

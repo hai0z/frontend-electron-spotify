@@ -1,5 +1,3 @@
-// import { zing } from "zingmp3-api-next";
-import { ZingMp3 } from "./index";
 import axios from "axios";
 
 const instance = axios.create({
@@ -21,20 +19,9 @@ async function getHome() {
   return data.data;
 }
 
-async function getTop100() {
-  const data = await ZingMp3.getTop100();
-  return data;
-}
-
 async function getChartHome() {
   const data = await instance.get("charthome");
   return data.data.data;
-}
-
-function getNewReleaseChart() {
-  ZingMp3.getNewReleaseChart().then((data) => {
-    return data;
-  });
 }
 
 async function getInfo(songId: string) {
@@ -97,10 +84,6 @@ async function getSuggest(_: string) {
   // const data = await zing.get_suggestion_keyword(keyword);
   // return data;
 }
-async function getSongBackground(songId: string) {
-  const data = await ZingMp3.getLyric(songId);
-  return data.data.defaultIBGUrls;
-}
 
 const getHub = async () => {
   const item = await instance.get("hub");
@@ -116,16 +99,13 @@ export {
   getSong,
   getDetailPlaylist,
   getHome,
-  getTop100,
   getChartHome,
-  getNewReleaseChart,
   getInfo,
   getArtistSong,
   getLyric,
   search,
   getSuggest,
   getArtist,
-  getSongBackground,
   getHub,
   getRecommendSong,
 };
