@@ -177,7 +177,7 @@ export default function TrackContextMenu() {
               ))}
             </Submenu>
           ) : (
-            <Link to={`/artist/${selectedTrack?.artists[0].alias}`}>
+            <Link to={`/artist/${selectedTrack?.artists?.[0]?.alias}`}>
               <Item>
                 <ProfileCircle size={24} />
                 <span className="ml-2">Chuyển đến nghệ sĩ</span>

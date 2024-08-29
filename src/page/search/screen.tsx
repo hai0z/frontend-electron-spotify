@@ -40,8 +40,12 @@ const SearchScreen = () => {
         const recommendSongRespone = await getRecommendSong(
           data?.data.songs[0].encodeId
         );
-
-        setRecommendSong(recommendSongRespone.data.data);
+        if (recommendSongRespone.data.data.items !== undefined)
+          setRecommendSong(recommendSongRespone.data.data);
+        else
+          setRecommendSong({
+            items: [],
+          });
       }
       return data.data;
     },

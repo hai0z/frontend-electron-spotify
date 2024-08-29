@@ -90,10 +90,10 @@ const NowPlaying = () => {
               <span className="text-xl font-bold">{currentSong?.title}</span>
               <div>
                 <Link
-                  to={`/artist/${currentSong?.artists[0].alias}`}
+                  to={`/artist/${currentSong?.artists?.[0]?.alias}`}
                   className="hover:underline"
                 >
-                  {currentSong?.artists[0].name}
+                  {currentSong?.artists?.[0]?.name}
                 </Link>
               </div>
             </div>
@@ -102,32 +102,33 @@ const NowPlaying = () => {
         </div>
 
         {/* artis card */}
-        <div className="relative mt-4 px-2">
-          <div className="relative">
-            <span className="absolute top-2 left-4 font-semibold z-10">
-              Giới thiệu về nghệ sĩ
-            </span>
-            <img
-              src={artist?.thumbnailM}
-              alt=""
-              className="rounded-t-lg object-cover brightness-50"
-              style={{
-                aspectRatio: 4 / 3,
-              }}
-            />
+        {artist && (
+          <div className="relative mt-4 px-2">
+            <div className="relative">
+              <span className="absolute top-2 left-4 font-semibold z-10">
+                Giới thiệu về nghệ sĩ
+              </span>
+              <img
+                src={artist?.thumbnailM}
+                alt=""
+                className="rounded-t-lg object-cover brightness-50"
+                style={{
+                  aspectRatio: 4 / 3,
+                }}
+              />
+            </div>
+            <div className="bg-base-300 flex flex-col px-4 rounded-b-lg p-2">
+              <Link
+                to={`/artist/${artist?.alias}`}
+                className="font-bold hover:underline"
+              >
+                {artist?.name}
+              </Link>
+              <span>Ngày sinh: {artist?.birthday || "không rõ"}</span>
+              <span>Người theo dõi: {artist?.follow} </span>
+            </div>
           </div>
-          <div className="bg-base-300 flex flex-col px-4 rounded-b-lg p-2">
-            <Link
-              to={`/artist/${artist?.alias}`}
-              className="font-bold hover:underline"
-            >
-              {artist?.name}
-            </Link>
-            <span>Ngày sinh: {artist?.birthday || "không rõ"}</span>
-            <span>Người theo dõi: {artist?.follow} </span>
-          </div>
-        </div>
-
+        )}
         <div className="relative mt-4 mx-2 bg-base-300 flex flex-col px-4 rounded-lg">
           <div className="py-2 flex flex-col">
             <span>
@@ -172,22 +173,22 @@ const NowPlaying = () => {
         <div className="relative mt-4 mx-2 bg-base-300 flex flex-col px-4 rounded-lg py-2">
           <span className="font-semibold">Tiếp theo trong danh sách chờ</span>
           <div className="flex flex-row items-center gap-2 mt-1 group cursor-pointer">
-            <div className="relative">
+            <div className="relative w-12 h-12">
               <img
                 src={
                   currentSongIndex === playlist.songs.length - 1
-                    ? queue[0]?.thumbnailM
-                    : queue[currentSongIndex + 1]?.thumbnailM
+                    ? queue?.[0]?.thumbnailM
+                    : queue?.[currentSongIndex + 1]?.thumbnailM
                 }
                 alt=""
-                className="h-12 w-12 rounded-lg group-hover:brightness-50"
+                className="w-full h-full rounded-lg group-hover:brightness-50"
               />
               <div
-                className="absolute top-0 left-0 w-full h-full  justify-center items-center hidden group-hover:flex"
+                className="absolute top-0 left-0 w-full h-full  justify-center items-center hidden group-hover:flex flex-1"
                 onClick={() =>
                   handlePlaySong(
                     currentSongIndex === playlist.songs.length - 1
-                      ? queue[0]
+                      ? queue?.[0]
                       : queue[currentSongIndex + 1],
                     playlist
                   )
@@ -196,16 +197,16 @@ const NowPlaying = () => {
                 <BsFillPlayFill />
               </div>
             </div>
-            <div className="flex flex-col">
+            <div className="flex flex-col flex-1">
               <span className="line-clamp-1">
                 {currentSongIndex === playlist.songs.length - 1
-                  ? queue[0]?.title
-                  : queue[currentSongIndex + 1]?.title}
+                  ? queue?.[0]?.title
+                  : queue?.[currentSongIndex + 1]?.title}
               </span>
               <span className="line-clamp-1">
                 {currentSongIndex === playlist.songs.length - 1
-                  ? queue[0]?.artistsNames
-                  : queue[currentSongIndex + 1]?.artistsNames}
+                  ? queue?.[0]?.artistsNames
+                  : queue?.[currentSongIndex + 1]?.artistsNames}
               </span>
             </div>
           </div>
