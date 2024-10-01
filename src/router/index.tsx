@@ -1,12 +1,11 @@
 import { createHashRouter, Outlet, RouterProvider } from "react-router-dom";
-import AuthProvider from "../context/AuthProvider";
+import AuthProvider, { useAuth } from "../context/AuthProvider";
 import AppProvider from "../context/AppProvider";
 import Frame from "../components/Frame";
 import LeftSideBar from "../components/left-side-bar/LeftSideBar";
 import Queue from "../components/Queue";
 import MusicPlayer from "../components/MusicPlayer";
 import FullScreenMode from "../components/FullScreenMode";
-import HomePage from "../page/HomePage";
 import LoginScreen from "../page/Login";
 import PlaylistPage from "../page/Playlist";
 import LyricPage from "../page/LyricPage";
@@ -24,10 +23,29 @@ import TrackContextMenu from "../components/TrackContextMenu";
 import Setting from "../page/Setting";
 import ChartPage from "../page/Chart";
 import { motion } from "framer-motion";
+import HomePage from "../page/HomePage";
+import dayjs from "dayjs";
+import Account from "../page/Account";
+
+const VipAlert = () => {
+  const { userData } = useAuth();
+  const isVip = dayjs.unix(userData?.vip?.expired?.seconds).isAfter(dayjs());
+
+  return !isVip ? (
+    <div className="toast toast-top toast-center z-[999] mt-10">
+      <div className="alert alert-error">
+        <span>Đăng kí VIP để tiếp tục nghe</span>
+      </div>
+    </div>
+  ) : (
+    <></>
+  );
+};
 const MainLayout = () => {
   return (
     <AuthProvider>
       <AppProvider>
+        <VipAlert />
         <Frame />
         <motion.div
           initial={{ opacity: 0 }}
@@ -62,6 +80,10 @@ const router = createHashRouter([
     path: "/",
     element: <MainLayout />,
     children: [
+      {
+        path: "/account",
+        element: <Account />,
+      },
       {
         path: "/",
         id: "home",

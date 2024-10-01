@@ -3,12 +3,17 @@ import { Link, useNavigate } from "react-router-dom";
 import { MdKeyboardArrowLeft, MdKeyboardArrowRight } from "react-icons/md";
 import Logo from "../assets/sound.png";
 import { useTrackPlayerStore } from "../store/TrackPlayerStore";
+import { useAuth } from "../context/AuthProvider";
+import dayjs from "dayjs";
 interface Props {
   color: string;
   content?: React.JSX.Element;
 }
 function Header({ color, content }: Props) {
   const navigate = useNavigate();
+  const { userData } = useAuth();
+  const isVip = dayjs.unix(userData?.vip?.expired?.seconds).isAfter(dayjs());
+
   return (
     <div
       className="flex-row h-16 sticky top-0 w-full z-10 flex items-center justify-between rounded-t-md px-4 "
@@ -42,9 +47,9 @@ function Header({ color, content }: Props) {
           className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52"
         >
           <li>
-            <Link to="/" className="justify-between">
+            <Link to="/account" className="justify-between">
               Tài khoản
-              <span className="badge">New</span>
+              <span className="badge">{isVip ? "VIP" : "FREE"}</span>
             </Link>
           </li>
           <li>

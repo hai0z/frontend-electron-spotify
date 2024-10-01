@@ -16,8 +16,11 @@ import { useAppSettingStore } from "../store/AppSettingStore";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { LuPlaySquare } from "react-icons/lu";
 import ToggleLikeButton from "./ToggleLikeButton";
+import { useAuth } from "../context/AuthProvider";
+import dayjs from "dayjs";
 
 function Player() {
+  const { userData } = useAuth();
   const {
     isPlaying,
     currentSong,
@@ -73,6 +76,7 @@ function Player() {
     }
   }, [isPlaying, currentSong]);
 
+  const isVip = dayjs.unix(userData?.vip?.expired?.seconds).isAfter(dayjs());
   return (
     <div className="w-full bg-base-300 h-20 absolute bottom-0 items-center flex flex-row justify-between px-4 z-50">
       <div className="flex flex-row items-center flex-1 ">
@@ -117,7 +121,7 @@ function Player() {
           loop={isLoop}
           onEnded={handleNextSong}
           ref={audioRef}
-          src={currentSong?.url}
+          src={isVip ? currentSong?.url : null}
           onTimeUpdate={(e) => {
             if (audioRef?.current) {
               setCurrentTime(e.currentTarget.currentTime);

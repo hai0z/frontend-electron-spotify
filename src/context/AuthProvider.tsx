@@ -3,12 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase/config";
 import { getRecentListening } from "../services/firebase";
 import { useUserStore } from "../store/UserStore";
-import { collection, onSnapshot, query } from "firebase/firestore";
+import { collection, doc, onSnapshot, query } from "firebase/firestore";
 import React from "react";
 
 interface IAuthContext {
   isLogin: boolean;
   setIsLogin: (isLogin: boolean) => void;
+  userData: any;
+  setUserData: (userData: any) => void;
 }
 const AuthContext = React.createContext({} as IAuthContext);
 
@@ -19,11 +21,18 @@ export default function AuthProvider({
 }) {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = React.useState(false);
+  const [userData, setUserData] = React.useState<any>({});
   const { setRecentList, setLikedPlaylists, setLikedSongs, setMyPlaylists } =
     useUserStore();
 
   const getUserData = async () => {
     const recentList = await getRecentListening();
+    const unsub4 = onSnapshot(
+      doc(db, `users/${auth.currentUser?.uid}`),
+      (doc) => {
+        setUserData(doc.data() as any);
+      }
+    );
     setRecentList(recentList as any[]);
     const q = query(collection(db, `users/${auth.currentUser?.uid}/likedSong`));
     const unsub = onSnapshot(q, (querySnapshot) => {
@@ -57,6 +66,7 @@ export default function AuthProvider({
       unsub();
       unsub1();
       unsub2();
+      unsub4();
     };
   };
   React.useEffect(() => {
@@ -74,7 +84,9 @@ export default function AuthProvider({
     return () => unsubscribe();
   }, []);
   return (
-    <AuthContext.Provider value={{ isLogin, setIsLogin }}>
+    <AuthContext.Provider
+      value={{ isLogin, setIsLogin, userData, setUserData }}
+    >
       {children}
     </AuthContext.Provider>
   );

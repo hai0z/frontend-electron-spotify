@@ -14,7 +14,7 @@
     "@tanstack/react-query": "^5.51.23",
     "@types/tinycolor2": "^1.4.6",
     "axios": "^1.7.4",
-    "dayjs": "^1.11.12",
+    "dayjs": "^1.11.13",
     "fast-average-color": "^9.4.0",
     "firebase": "^10.12.2",
     "font-color-contrast": "^11.1.0",
