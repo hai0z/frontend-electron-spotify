@@ -275,8 +275,8 @@ const FullScreenMode = () => {
                               className={
                                 "cursor-pointer inline-block text-[40px] font-bold select-none text-center " +
                                 (e.startTime <= currentTime * 1000 &&
-                                currentTime * 1000 <= e.endTime
-                                  ? "opacity-100"
+                                currentTime * 1000 <= e.endTime + 500
+                                  ? "opacity-100 text-yellow-300"
                                   : "opacity-50")
                               }
                             >

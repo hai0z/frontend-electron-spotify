@@ -1,5 +1,5 @@
 import { useTrackPlayerStore } from "../store/TrackPlayerStore";
-import { useContext, useEffect } from "react";
+import { memo, useContext, useEffect, useMemo } from "react";
 import { BiShuffle, BiSkipNext, BiSkipPrevious } from "react-icons/bi";
 import { BsFillPauseFill, BsFillPlayFill } from "react-icons/bs";
 import { RxLoop, RxSpeakerLoud } from "react-icons/rx";
@@ -76,7 +76,9 @@ function Player() {
     }
   }, [isPlaying, currentSong]);
 
-  const isVip = dayjs.unix(userData?.vip?.expired?.seconds).isAfter(dayjs());
+  const isVip = useMemo(() => {
+    return dayjs.unix(userData?.vip?.expired?.seconds).isAfter(dayjs());
+  }, [userData]);
   return (
     <div className="w-full bg-base-300 h-20 absolute bottom-0 items-center flex flex-row justify-between px-4 z-50">
       <div className="flex flex-row items-center flex-1 ">
@@ -121,7 +123,7 @@ function Player() {
           loop={isLoop}
           onEnded={handleNextSong}
           ref={audioRef}
-          src={isVip ? currentSong?.url : null}
+          src={isVip ? currentSong?.url : ""}
           onTimeUpdate={(e) => {
             if (audioRef?.current) {
               setCurrentTime(e.currentTarget.currentTime);
@@ -313,4 +315,4 @@ function Player() {
   );
 }
 
-export default Player;
+export default memo(Player);

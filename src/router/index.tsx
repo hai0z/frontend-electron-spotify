@@ -29,9 +29,10 @@ import Account from "../page/Account";
 
 const VipAlert = () => {
   const { userData } = useAuth();
+  console.log(userData);
   const isVip = dayjs.unix(userData?.vip?.expired?.seconds).isAfter(dayjs());
 
-  return !isVip ? (
+  return !isVip && userData !== null ? (
     <div className="toast toast-top toast-center z-[999] mt-10">
       <div className="alert alert-error">
         <span>Đăng kí VIP để tiếp tục nghe</span>

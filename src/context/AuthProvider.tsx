@@ -21,7 +21,7 @@ export default function AuthProvider({
 }) {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = React.useState(false);
-  const [userData, setUserData] = React.useState<any>({});
+  const [userData, setUserData] = React.useState<any>(null);
   const { setRecentList, setLikedPlaylists, setLikedSongs, setMyPlaylists } =
     useUserStore();
 
