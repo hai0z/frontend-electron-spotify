@@ -89,7 +89,9 @@ export default function useTrackPlayer() {
       setIsShuffle(false);
     }
     if (song.encodeId !== currentSong?.encodeId) {
-      setIsPlaying(true);
+      setTimeout(() => {
+        setIsPlaying(true);
+      }, 250);
       setCurrentSong(song);
     } else {
       setIsPlaying(!isPlaying);
