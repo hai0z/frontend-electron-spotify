@@ -46,7 +46,7 @@ const LyricPage = () => {
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
           zIndex: -1,
-          filter: "blur(120px) brightness(0.8)",
+          filter: "blur(120px) brightness(0.5)",
         }}
       ></motion.div>
       <div className="w-full h-full sticky top-0 pb-20">
@@ -79,7 +79,7 @@ const LyricPage = () => {
                         className={
                           "cursor-pointer inline-block text-[28px]  font-bold select-none hover:opacity-100 " +
                           (e.startTime <= currentTime * 1000
-                            ? "opacity-100 text-yellow-300 drop-shadow-2xl"
+                            ? "opacity-100  drop-shadow-2xl"
                             : "opacity-50")
                         }
                       >
