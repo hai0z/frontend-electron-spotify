@@ -26,7 +26,7 @@ import { motion } from "framer-motion";
 import HomePage from "../page/HomePage";
 import dayjs from "dayjs";
 import Account from "../page/Account";
-import YoutubeHome from "../page/youtube/home";
+import YoutubeHome from "../page/youtube/Home";
 
 const VipAlert = () => {
   const { userData } = useAuth();

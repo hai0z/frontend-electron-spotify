@@ -1,5 +1,4 @@
 import { useTrackPlayerStore } from "../store/TrackPlayerStore";
-import getThumbnail from "../utils/getThumnail";
 import { CloseCircle, Headphone, Heart, MusicCircle } from "iconsax-react";
 import { BsFillPlayFill } from "react-icons/bs";
 import { motion, AnimatePresence } from "framer-motion";
@@ -28,7 +27,7 @@ const NowPlaying = () => {
     (item) => item.encodeId === currentSong?.encodeId
   );
 
-  const { data: artist, isLoading: isLoadingArtist } = useQuery({
+  const { data: artist } = useQuery({
     queryKey: ["artist", currentSong?.encodeId],
     queryFn: async () => {
       const res = await getArtist(currentSong?.artists?.[0]?.alias);
@@ -38,7 +37,7 @@ const NowPlaying = () => {
     enabled: !!currentSong?.artists?.[0]?.alias,
   });
 
-  const { data: songInfo, isLoading: isLoadingSongInfo } = useQuery({
+  const { data: songInfo } = useQuery({
     queryKey: ["info-song", currentSong?.encodeId],
     queryFn: async () => {
       const res = await getInfo(currentSong?.encodeId);

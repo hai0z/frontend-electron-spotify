@@ -6,7 +6,6 @@ import { useAuth } from "./AuthProvider";
 import { useContextMenu } from "react-contexify";
 import { useTrackPlayerStore } from "../store/TrackPlayerStore";
 import axios from "axios";
-import { convertYoutubeToZingSong } from "../page/youtube/Home";
 export const MENU_ID = "TRACK_CONTEXT_MENU";
 interface IAppContext {
   currentTime: number;

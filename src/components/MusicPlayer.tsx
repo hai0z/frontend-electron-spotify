@@ -6,7 +6,6 @@ import { RxLoop, RxSpeakerLoud } from "react-icons/rx";
 import { TbMicrophone2 } from "react-icons/tb";
 import { HiOutlineQueueList } from "react-icons/hi2";
 import { CgArrowsExpandRight } from "react-icons/cg";
-import getThumbnail from "../utils/getThumnail";
 import { AppContext } from "../context/AppProvider";
 import caculateTime from "../utils/caculateTime";
 import useTrackPlayer from "../hooks/useTrackPlayer";

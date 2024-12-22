@@ -1,6 +1,5 @@
 import { useTrackPlayerStore } from "../store/TrackPlayerStore";
 import React, { useEffect } from "react";
-import getThumbnail from "../utils/getThumnail";
 import { CloseCircle } from "iconsax-react";
 import useTrackPlayer from "../hooks/useTrackPlayer";
 import { BsFillPauseFill, BsFillPlayFill } from "react-icons/bs";
