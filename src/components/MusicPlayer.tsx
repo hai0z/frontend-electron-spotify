@@ -53,7 +53,6 @@ function Player() {
     toggleShuffle,
     handlePlayPause,
   } = useTrackPlayer();
-
   const handleFullscreen = () => {
     if (document.documentElement.requestFullscreen) {
       document.documentElement.requestFullscreen();
@@ -62,7 +61,7 @@ function Player() {
   };
 
   useEffect(() => {
-    if (audioRef.current) {
+    if (audioRef?.current) {
       audioRef.current.volume = volume;
       audioRef.current.currentTime = currentTime;
     }
@@ -79,45 +78,54 @@ function Player() {
   const isVip = useMemo(() => {
     return dayjs.unix(userData?.vip?.expired?.seconds).isAfter(dayjs());
   }, [userData]);
+
+  const { youtubeUrlLoading } = useContext(AppContext);
   return (
-    <div className="w-full bg-base-300 h-20 absolute bottom-0 items-center flex flex-row justify-between px-4 z-50">
-      <div className="flex flex-row items-center flex-1 ">
+    <div className="w-full bg-gradient-to-b from-base-300 to-base-200 h-24 absolute bottom-0 items-center flex flex-row justify-between px-6 z-50 shadow-lg">
+      <div className="flex flex-row items-center flex-1 gap-4">
         {currentSong && (
-          <motion.img
+          <motion.div
             key={currentSong?.encodeId}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            src={getThumbnail(currentSong?.thumbnailM) as string}
-            alt=""
-            className="h-16 w-16 rounded-lg"
-          />
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.3 }}
+            className="relative group"
+          >
+            <img
+              src={currentSong?.thumbnailM}
+              alt=""
+              className="h-16 w-16 rounded-xl shadow-md transition-transform group-hover:scale-105 object-contain"
+            />
+            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity flex items-center justify-center">
+              <BsFillPlayFill className="text-3xl text-white" />
+            </div>
+          </motion.div>
         )}
-        <div className="flex flex-col w-52">
-          <span className=" ml-2 font-semibold line-clamp-1">
+        <div className="flex flex-col w-60">
+          <span className="font-bold text-base line-clamp-1 hover:text-primary transition-colors">
             {currentSong?.title}
           </span>
-
-          <div className="ml-2 flex flex-row flex-1">
+          <div className="flex flex-row flex-1">
             {currentSong?.artists?.map((artist: any, index: number) => (
               <Link
                 key={artist.alias}
                 to={`/artist/${artist.alias}`}
-                className={`text-[12px] hover:underline cursor-pointer line-clamp-1`}
+                className="text-sm hover:text-primary transition-colors line-clamp-1"
               >
                 {artist.name}
                 {currentSong?.artists.length - 1 > index ? (
-                  <span className="mr-1">, </span>
+                  <span className="mx-1">, </span>
                 ) : null}
               </Link>
             ))}
           </div>
         </div>
-        <div className="ml-4">
+        <div className="ml-2">
           <ToggleLikeButton />
         </div>
       </div>
-      <div className="flex flex-col items-center h-full pt-2 flex-1">
+
+      <div className="flex flex-col items-center h-full justify-center flex-1 gap-2">
         <audio
           preload="auto"
           loop={isLoop}
@@ -133,65 +141,60 @@ function Player() {
             setDuration(e.currentTarget.duration);
           }}
         />
-        <div className="flex flex-row items-center justify-between mt-1 gap-4">
-          <div
-            className="w-8 h-8  rounded-full flex justify-center items-center cursor-pointer"
+        <div className="flex flex-row items-center justify-center gap-6">
+          <button
+            className="w-10 h-10 rounded-full flex justify-center items-center hover:bg-base-content/10 transition-colors"
             onClick={toggleShuffle}
           >
             <BiShuffle
-              className="text-[24px]"
+              className="text-2xl transition-colors"
               style={{
-                color:
-                  isShuffle == true ? "oklch(var(--p))" : "oklch(var(--bc))",
+                color: isShuffle ? "oklch(var(--p))" : "oklch(var(--bc))",
               }}
             />
-          </div>
-          <div
-            className="w-8 h-8 rounded-full flex justify-center items-center cursor-pointer"
+          </button>
+          <button
+            className="w-10 h-10 rounded-full flex justify-center items-center hover:bg-base-content/10 transition-colors"
             onClick={handlePrevSong}
           >
-            <BiSkipPrevious className="text-[30px]" />
-          </div>
-          <div
-            className="w-8 h-8 bg-base-content rounded-full flex justify-center items-center cursor-pointer"
+            <BiSkipPrevious className="text-3xl" />
+          </button>
+          <button
+            className="w-12 h-12 bg-primary rounded-full flex justify-center items-center hover:bg-primary-focus transition-colors shadow-lg"
             onClick={handlePlayPause}
           >
-            {!isPlaying ? (
-              <BsFillPlayFill
-                className="text-[24px]"
-                color="oklch(var(--b3))"
-                onClick={handlePlayPause}
-              />
+            {youtubeUrlLoading ? (
+              <div className="w-12 h-12 bg-primary rounded-full flex justify-center items-center hover:bg-primary-focus transition-colors shadow-lg">
+                <div className="loading loading-spinner loading-sm text-primary-content"></div>
+              </div>
+            ) : !isPlaying ? (
+              <BsFillPlayFill className="text-2xl text-primary-content" />
             ) : (
-              <BsFillPauseFill
-                className="text-[24px]"
-                color="oklch(var(--b3))"
-                onClick={handlePlayPause}
-              />
+              <BsFillPauseFill className="text-2xl text-primary-content" />
             )}
-          </div>
-          <div
-            className="w-8 h-8 justify-center items-center cursor-pointer flex"
+          </button>
+          <button
+            className="w-10 h-10 rounded-full flex justify-center items-center hover:bg-base-content/10 transition-colors"
             onClick={handleNextSong}
           >
-            <BiSkipNext className="text-[30px] bg-base" />
-          </div>
-          <div
-            className="w-8 h-8 rounded-full flex justify-center items-center cursor-pointer"
+            <BiSkipNext className="text-3xl" />
+          </button>
+          <button
+            className="w-10 h-10 rounded-full flex justify-center items-center hover:bg-base-content/10 transition-colors"
             onClick={toggleLoop}
           >
             <RxLoop
-              className="text-[24px]"
+              className="text-2xl transition-colors"
               style={{
-                color: isLoop == true ? "oklch(var(--p))" : "oklch(var(--bc))",
+                color: isLoop ? "oklch(var(--p))" : "oklch(var(--bc))",
               }}
             />
-          </div>
+          </button>
         </div>
-        <div className="flex flex-row justify-between items-center w-[500px] gap-2 mt-2">
-          <div className="w-14  justify-center items-center flex">
-            <span className=" text-[12px]">{caculateTime(currentTime)}</span>
-          </div>
+        <div className="flex flex-row justify-between items-center w-[500px] gap-3">
+          <span className="text-xs w-12 text-center">
+            {caculateTime(currentTime)}
+          </span>
           <InputSlider
             x={currentTime}
             xmin={0}
@@ -204,52 +207,51 @@ function Player() {
             axis="x"
             styles={{
               active: {
-                backgroundColor: "oklch(var(--bc))",
+                backgroundColor: "oklch(var(--p))",
               },
               track: {
-                backgroundColor: "#ffffff20",
+                backgroundColor: "oklch(var(--bc)/.2)",
                 width: "100%",
                 height: 4,
                 cursor: "pointer",
               },
               thumb: {
-                width: 10,
-                height: 10,
-                opacity: 0,
+                width: 12,
+                height: 12,
+                backgroundColor: "oklch(var(--p))",
+                opacity: 1,
+                transition: "transform 0.2s",
+                ":hover": {
+                  transform: "scale(1.2)",
+                },
               },
             }}
           />
-          <div className="w-14  flex justify-center items-center">
-            <span className=" text-[12px] text-center">
-              {caculateTime(duration)}
-            </span>
-          </div>
+          <span className="text-xs w-12 text-center">
+            {caculateTime(duration)}
+          </span>
         </div>
       </div>
-      <div className="flex flex-row flex-1 items-center justify-end h-full">
-        <div
-          className="cursor-pointer"
+
+      <div className="flex flex-row flex-1 items-center justify-end gap-6">
+        <button
+          className="hover:text-primary transition-colors"
           onClick={() => {
             setNowPlayingVisible(!nowPlayingVisible);
             setQueueVisible(false);
           }}
         >
           <LuPlaySquare
-            size={20}
-            className="mr-4"
+            size={22}
             style={{
-              color: nowPlayingVisible ? "oklch(var(--p))" : "oklch(var(--bc))",
+              color: nowPlayingVisible ? "oklch(var(--p))" : "currentColor",
             }}
           />
-        </div>
+        </button>
+
         {(currentSong?.hasLyric || pathName === "/lyric") && (
-          <TbMicrophone2
-            size={20}
-            className="font-bold mr-4 cursor-pointer"
-            style={{
-              color:
-                pathName === "/lyric" ? "oklch(var(--p))" : "oklch(var(--bc))",
-            }}
+          <button
+            className="hover:text-primary transition-colors"
             onClick={() => {
               if (pathName !== "/lyric") {
                 setIsShowLyric(true);
@@ -259,24 +261,34 @@ function Player() {
                 setIsShowLyric(false);
               }
             }}
-          />
+          >
+            <TbMicrophone2
+              size={22}
+              style={{
+                color:
+                  pathName === "/lyric" ? "oklch(var(--p))" : "currentColor",
+              }}
+            />
+          </button>
         )}
-        <div
+
+        <button
+          className="hover:text-primary transition-colors"
           onClick={() => {
             setQueueVisible(!queueVisible);
             setNowPlayingVisible(false);
           }}
         >
           <HiOutlineQueueList
-            size={20}
-            className="mr-4 cursor-pointer"
+            size={22}
             style={{
-              color: queueVisible ? "oklch(var(--p))" : "oklch(var(--bc))",
+              color: queueVisible ? "oklch(var(--p))" : "currentColor",
             }}
           />
-        </div>
-        <div className="flex flex-row items-center w-28 gap-x-2">
-          <RxSpeakerLoud className=" font-bold" size={20} />
+        </button>
+
+        <div className="flex flex-row items-center gap-3 w-32">
+          <RxSpeakerLoud size={22} />
           <InputSlider
             axis="x"
             x={volume}
@@ -285,18 +297,23 @@ function Player() {
             xstep={0.01}
             styles={{
               active: {
-                backgroundColor: "oklch(var(--bc))",
+                backgroundColor: "oklch(var(--p))",
               },
               track: {
-                backgroundColor: "#ffffff20",
+                backgroundColor: "oklch(var(--bc)/.2)",
                 width: "100%",
                 height: 4,
                 cursor: "pointer",
               },
               thumb: {
-                opacity: 0,
-                width: 10,
-                height: 10,
+                width: 12,
+                height: 12,
+                backgroundColor: "oklch(var(--p))",
+                opacity: 1,
+                transition: "transform 0.2s",
+                ":hover": {
+                  transform: "scale(1.2)",
+                },
               },
             }}
             onChange={({ x }) => {
@@ -307,9 +324,13 @@ function Player() {
             }}
           />
         </div>
-        <div className="ml-4 cursor-pointer" onClick={handleFullscreen}>
-          <CgArrowsExpandRight size={20} />
-        </div>
+
+        <button
+          className="hover:text-primary transition-colors"
+          onClick={handleFullscreen}
+        >
+          <CgArrowsExpandRight size={22} />
+        </button>
       </div>
     </div>
   );

@@ -26,6 +26,7 @@ import { motion } from "framer-motion";
 import HomePage from "../page/HomePage";
 import dayjs from "dayjs";
 import Account from "../page/Account";
+import YoutubeHome from "../page/youtube/home";
 
 const VipAlert = () => {
   const { userData } = useAuth();
@@ -84,6 +85,10 @@ const router = createHashRouter([
       {
         path: "/account",
         element: <Account />,
+      },
+      {
+        path: "/youtube",
+        element: <YoutubeHome />,
       },
       {
         path: "/",

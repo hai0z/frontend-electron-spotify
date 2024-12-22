@@ -41,7 +41,7 @@ const Queue = () => {
         display: queueVisible ? "flex" : "none",
         flexDirection: "column",
       }}
-      className="bg-base-200 rounded-lg  flex-col overflow-y-auto 0 overflow-x-hidden"
+      className="bg-base-200 rounded-lg  flex-col overflow-y-auto 0 overflow-x-hidden pb-20"
     >
       <div className="flex flex-row items-center justify-between  py-4 sticky bg-base-200 top-0 w-full z-50 px-2">
         <span className="text-lg font-bold ml-3">Hàng đợi</span>
@@ -76,13 +76,11 @@ const Queue = () => {
               )}
             </div>
             <img
-              src={
-                getThumbnail(queue[currentSongIndex]?.thumbnail, 1080) as string
-              }
+              src={queue[currentSongIndex]?.thumbnail}
               alt={queue[currentSongIndex]?.title}
               width={48}
               height={48}
-              className="rounded-lg"
+              className="rounded-lg object-contain w-12 h-12"
             />
           </div>
           <div className="ml-2  flex flex-wrap flex-col flex-1">
@@ -128,11 +126,11 @@ const Queue = () => {
                 <BsFillPlayFill color="white" />
               </div>
               <img
-                src={getThumbnail(track.thumbnail, 1080) as string}
+                src={track.thumbnail}
                 alt={track.title}
                 width={48}
                 height={48}
-                className="rounded-lg"
+                className="rounded-lg object-cover"
               />
             </div>
             <div className="ml-2 flex flex-wrap flex-col flex-1">

@@ -10,10 +10,18 @@ import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import Frame from "../components/Frame";
 import toast, { Toaster } from "react-hot-toast";
+
 const LoginScreen = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = React.useState<string>("");
-  const [password, setPassword] = React.useState<string>("");
+  const [email, setEmail] = React.useState<string>(() => {
+    return localStorage.getItem("rememberedEmail") || "";
+  });
+  const [password, setPassword] = React.useState<string>(() => {
+    return localStorage.getItem("rememberedPassword") || "";
+  });
+  const [rememberMe, setRememberMe] = React.useState<boolean>(() => {
+    return localStorage.getItem("rememberMe") === "true";
+  });
 
   const handleLogin = async () => {
     try {
@@ -34,6 +42,17 @@ const LoginScreen = () => {
           email: userEmail,
         });
       }
+
+      if (rememberMe) {
+        localStorage.setItem("rememberedEmail", email);
+        localStorage.setItem("rememberedPassword", password);
+        localStorage.setItem("rememberMe", "true");
+      } else {
+        localStorage.removeItem("rememberedEmail");
+        localStorage.removeItem("rememberedPassword");
+        localStorage.removeItem("rememberMe");
+      }
+
       navigate("/", { replace: true });
     } catch (error: any) {
       throw new Error("Sai tên đăng nhập hoặc mật khẩu");
@@ -41,57 +60,91 @@ const LoginScreen = () => {
   };
 
   return (
-    <div className="w-full h-[calc(100vh-40px)] overflow-y-hidden">
+    <div className="w-full h-screen overflow-y-hidden">
       <Frame />
       <Toaster />
 
-      <div className="w-full h-full bg-gradient-to-b from-primary/30 to-base-100 flex flex-col justify-center items-center">
-        <div className="w-1/2 flex flex-col bg-base-100 rounded-xl p-4">
-          <div className="flex jce items-center flex-col">
-            <img src={logo} alt="" className="w-24 h24" />
-            <span className="text-3xl font-bold">Đăng nhập vào Harmonify</span>
+      <div className="w-full h-full flex ">
+        {/* Left side - Decorative/Branding */}
+        <div className="w-1/2 bg-gradient-to-br from-primary/30 to-secondary/30 flex items-center justify-center p-8">
+          <div className="text-center">
+            <img
+              src={logo}
+              alt="Harmonify Logo"
+              className="w-48 h-48 mx-auto animate-pulse"
+            />
+            <h1 className="text-5xl font-bold mt-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Harmonify
+            </h1>
+            <p className="text-xl mt-4 text-base-content/80">
+              Trải nghiệm âm nhạc tuyệt vời
+            </p>
           </div>
-          <div className="flex flex-col justify-center items-center gap-y-2 py-4">
-            <label className="form-control w-full max-w-md">
-              <div className="label">
-                <span className="label-text">Email</span>
-              </div>
-              <input
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                }}
-                type="text"
-                placeholder="Email"
-                className="input input-bordered w-full max-w-md"
-              />
-            </label>
-            <label className="form-control w-full max-w-md">
-              <div className="label">
-                <span className="label-text">Mật khẩu</span>
-              </div>
-              <input
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                }}
-                type="password"
-                placeholder="Mật khẩu"
-                className="input input-bordered w-full max-w-md"
-              />
-            </label>
-            <button
-              className="btn btn-primary max-w-md w-full mt-4"
-              onClick={() =>
-                toast.promise(handleLogin(), {
-                  success: "Đăng nhập thành công",
-                  error: (err) => err.message,
-                  loading: "Đang đăng nhập",
-                })
-              }
-            >
-              Đăng nhập
-            </button>
+        </div>
+
+        {/* Right side - Login Form */}
+        <div className="w-1/2 bg-base-100 flex items-center justify-center p-8">
+          <div className="w-full max-w-md">
+            <h2 className="text-3xl font-bold text-center mb-8">
+              Đăng nhập vào Harmonify
+            </h2>
+
+            <div className="flex flex-col gap-y-4">
+              <label className="form-control w-full">
+                <div className="label">
+                  <span className="label-text text-lg font-medium">Email</span>
+                </div>
+                <input
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                  }}
+                  type="text"
+                  placeholder="Nhập email của bạn"
+                  className="input input-bordered input-lg w-full focus:ring-2 focus:ring-primary"
+                />
+              </label>
+
+              <label className="form-control w-full">
+                <div className="label">
+                  <span className="label-text text-lg font-medium">
+                    Mật khẩu
+                  </span>
+                </div>
+                <input
+                  value={password}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                  }}
+                  type="password"
+                  placeholder="Nhập mật khẩu của bạn"
+                  className="input input-bordered input-lg w-full focus:ring-2 focus:ring-primary"
+                />
+              </label>
+
+              <label className="flex items-center gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="checkbox checkbox-primary"
+                />
+                <span className="label-text">Nhớ mật khẩu</span>
+              </label>
+
+              <button
+                className="btn btn-primary btn-lg w-full mt-6 text-lg font-semibold hover:brightness-110 transition-all duration-300"
+                onClick={() =>
+                  toast.promise(handleLogin(), {
+                    success: "Đăng nhập thành công",
+                    error: (err) => err.message,
+                    loading: "Đang đăng nhập",
+                  })
+                }
+              >
+                Đăng nhập
+              </button>
+            </div>
           </div>
         </div>
       </div>

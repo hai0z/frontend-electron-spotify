@@ -1,4 +1,3 @@
-"use client";
 import { useAppContext } from "../context/AppProvider";
 import useImageColor from "../hooks/useImageColor";
 import useTrackPlayer from "../hooks/useTrackPlayer";

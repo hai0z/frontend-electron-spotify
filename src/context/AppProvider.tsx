@@ -5,7 +5,8 @@ import { useAppSettingStore } from "../store/AppSettingStore";
 import { useAuth } from "./AuthProvider";
 import { useContextMenu } from "react-contexify";
 import { useTrackPlayerStore } from "../store/TrackPlayerStore";
-("use client");
+import axios from "axios";
+import { convertYoutubeToZingSong } from "../page/youtube/Home";
 export const MENU_ID = "TRACK_CONTEXT_MENU";
 interface IAppContext {
   currentTime: number;
@@ -15,7 +16,15 @@ interface IAppContext {
   setDuration: React.Dispatch<React.SetStateAction<number>>;
   audioRef: React.RefObject<HTMLAudioElement>;
   displayMenu: (e: any) => void;
+  youtubeUrlLoading: boolean;
 }
+const getYoutubeAudioUrl = async (songId: string) => {
+  const audioUrl = await axios.get(
+    `http://localhost:5151/api/youtube/get-audio?videoId=${songId}`
+  );
+  return audioUrl.data;
+};
+
 export const AppContext = React.createContext<IAppContext>({} as IAppContext);
 const AppProvider = ({ children }: { children: React.ReactNode }) => {
   const { currentSong, setCurrentSong, setIsPlaying, setLyric } =
@@ -50,6 +59,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
 
   const [duration, setDuration] = useState(0);
 
+  const [youtubeUrlLoading, setYoutubeUrlLoading] = useState(false);
   useEffect(() => {
     setIsPlaying(false);
     document.getElementsByTagName("html")[0]?.setAttribute("data-theme", theme);
@@ -62,18 +72,29 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     setLyric([]);
     setCurrentTime(0);
-    if (currentSong) {
+    if (currentSong?.type !== "youtubeSong") {
+      if (audioRef?.current) {
+        audioRef.current.src = "";
+        audioRef.current.load();
+      }
+      setYoutubeUrlLoading(false);
       getAudioUrl().then((audioUrl) => {
-        if (audioRef?.current) {
-          audioRef.current.src = "";
-          audioRef.current.load();
-        }
-
         setCurrentSong({ ...currentSong, url: audioUrl.data["128"] });
       });
 
       getLyric(currentSong?.encodeId).then((lyric) => {
         setLyric(lyric);
+      });
+    } else {
+      setYoutubeUrlLoading(true);
+      if (audioRef?.current) {
+        audioRef.current.src = "";
+        audioRef.current.load();
+      }
+
+      getYoutubeAudioUrl(currentSong?.encodeId).then((audioUrl) => {
+        setCurrentSong({ ...currentSong, url: audioUrl });
+        setYoutubeUrlLoading(false);
       });
     }
   }, [currentSong?.encodeId]);
@@ -88,6 +109,7 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
         setDuration,
         audioRef,
         displayMenu,
+        youtubeUrlLoading,
       }}
     >
       {isLogin && isLoaded && children}

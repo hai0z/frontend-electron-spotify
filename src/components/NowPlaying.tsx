@@ -1,8 +1,8 @@
 import { useTrackPlayerStore } from "../store/TrackPlayerStore";
 import getThumbnail from "../utils/getThumnail";
-import { CloseCircle, Headphone, Heart } from "iconsax-react";
+import { CloseCircle, Headphone, Heart, MusicCircle } from "iconsax-react";
 import { BsFillPlayFill } from "react-icons/bs";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAppSettingStore } from "../store/AppSettingStore";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -11,208 +11,254 @@ import dayjs from "dayjs";
 import useTrackPlayer from "../hooks/useTrackPlayer";
 import ToggleLikeButton from "./ToggleLikeButton";
 
-function formatNumber(num: number) {
-  if (num >= 1000000000) {
-    return (num / 1000000000).toFixed(1) + "B"; // Tỷ
-  } else if (num >= 1000000) {
-    return (num / 1000000).toFixed(1) + "M";
-  } else if (num >= 1000) {
-    return (num / 1000).toFixed(1) + "k";
-  } else {
-    return num.toString();
-  }
-}
+const formatNumber = (num: number) => {
+  const formatter = Intl.NumberFormat("en", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  });
+  return formatter.format(num);
+};
 
 const NowPlaying = () => {
   const { queue, currentSong, playlist } = useTrackPlayerStore();
-
   const { nowPlayingVisible, setNowPlayingVisible } = useAppSettingStore();
-
   const { handlePlaySong } = useTrackPlayer();
 
   const currentSongIndex = queue.findIndex(
     (item) => item.encodeId === currentSong?.encodeId
   );
 
-  const { data: artist } = useQuery({
+  const { data: artist, isLoading: isLoadingArtist } = useQuery({
     queryKey: ["artist", currentSong?.encodeId],
     queryFn: async () => {
       const res = await getArtist(currentSong?.artists?.[0]?.alias);
       return res.data.data;
     },
     refetchOnWindowFocus: false,
+    enabled: !!currentSong?.artists?.[0]?.alias,
   });
 
-  const { data: songInfo } = useQuery({
+  const { data: songInfo, isLoading: isLoadingSongInfo } = useQuery({
     queryKey: ["info-song", currentSong?.encodeId],
     queryFn: async () => {
       const res = await getInfo(currentSong?.encodeId);
       return res.data.data;
     },
+    enabled: !!currentSong?.encodeId,
   });
 
-  return (
-    <motion.div
-      layout
-      key={nowPlayingVisible ? "queue" : "none"}
-      style={{
-        height: "calc(100vh-80px)",
-        width: nowPlayingVisible ? 400 : 0,
-        minWidth: nowPlayingVisible ? 400 : 0,
-        display: nowPlayingVisible ? "flex" : "none",
-        flexDirection: "column",
-      }}
-      className="bg-base-200 rounded-lg  flex-col overflow-y-auto 0 overflow-x-hidden pb-20 "
-    >
-      <div className="flex flex-row items-center justify-between  py-4 sticky bg-base-200 top-0 w-full z-50 px-2">
-        <span className="text-lg font-bold ml-3 hover:underline">
-          <Link to={playlist?.link!}>{playlist?.title}</Link>
-        </span>
-        <motion.div className="div" whileHover={{ scale: 1.1 }}>
-          <CloseCircle
-            className="cursor-pointer mr-1"
-            size="24"
-            color="oklch(var(--bc))"
-            onClick={() => setNowPlayingVisible(false)}
-          />
-        </motion.div>
-      </div>
+  const nextSong =
+    currentSongIndex === playlist?.songs?.length - 1
+      ? queue?.[0]
+      : queue?.[currentSongIndex + 1];
 
-      <div className="mt-4 px-2">
-        <div className="bg-base-300 rounded-lg mx-2">
-          <img
-            src={getThumbnail(currentSong?.thumbnailM) as string}
-            alt="song-img"
-            className="rounded-t-lg"
-          />
-          <div className="mt-2 flex flex-row items-center justify-between px-3 py-2">
-            <div>
-              <span className="text-xl font-bold">{currentSong?.title}</span>
-              <div>
+  return (
+    <AnimatePresence>
+      {nowPlayingVisible && (
+        <motion.div
+          style={{
+            height: "calc(100vh-80px)",
+            minWidth: 400,
+          }}
+          className="card bg-base-200 shadow-xl overflow-y-auto overflow-x-hidden pb-20"
+        >
+          <div className="sticky top-0 z-50 navbar bg-base-200/95 backdrop-blur-md">
+            <div className="flex-1">
+              <Link
+                to={playlist?.link!}
+                className="btn btn-ghost gap-2 text-lg font-bold"
+              >
+                <MusicCircle variant="Bold" />
+                {playlist?.title}
+              </Link>
+            </div>
+            <div className="flex-none">
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className="btn btn-ghost btn-circle"
+                onClick={() => setNowPlayingVisible(false)}
+              >
+                <CloseCircle variant="Bold" />
+              </motion.button>
+            </div>
+          </div>
+
+          <motion.div
+            className="p-4 space-y-4"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2 }}
+          >
+            <motion.div className="card bg-base-300 shadow-xl overflow-hidden">
+              <figure>
+                <motion.img
+                  src={currentSong?.thumbnailM}
+                  alt="song-img"
+                  className="w-full"
+                  initial={{ scale: 1.2 }}
+                  animate={{ scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                />
+              </figure>
+              <div className="card-body">
+                <h2 className="card-title group">
+                  <span className="group-hover:text-primary transition-colors">
+                    {currentSong?.title}
+                  </span>
+                  <ToggleLikeButton />
+                </h2>
                 <Link
                   to={`/artist/${currentSong?.artists?.[0]?.alias}`}
-                  className="hover:underline"
+                  className="link link-hover text-base-content/70 hover:text-primary transition-colors line-clamp-2"
                 >
                   {currentSong?.artists?.[0]?.name}
                 </Link>
               </div>
-            </div>
-            <ToggleLikeButton />
-          </div>
-        </div>
+            </motion.div>
 
-        {/* artis card */}
-        {artist && (
-          <div className="relative mt-4 px-2">
-            <div className="relative">
-              <span className="absolute top-2 left-4 font-semibold z-10">
-                Giới thiệu về nghệ sĩ
-              </span>
-              <img
-                src={artist?.thumbnailM}
-                alt=""
-                className="rounded-t-lg object-cover brightness-50"
-                style={{
-                  aspectRatio: 4 / 3,
-                }}
-              />
-            </div>
-            <div className="bg-base-300 flex flex-col px-4 rounded-b-lg p-2">
-              <Link
-                to={`/artist/${artist?.alias}`}
-                className="font-bold hover:underline"
+            {artist && (
+              <motion.div
+                className="card bg-base-300 shadow-xl overflow-hidden"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
               >
-                {artist?.name}
-              </Link>
-              <span>Ngày sinh: {artist?.birthday || "không rõ"}</span>
-              <span>Người theo dõi: {artist?.follow} </span>
-            </div>
-          </div>
-        )}
-        <div className="relative mt-4 mx-2 bg-base-300 flex flex-col px-4 rounded-lg">
-          <div className="py-2 flex flex-col">
-            <span>
-              Ngày phát hành:{" "}
-              {songInfo?.releaseDate
-                ? dayjs.unix(songInfo?.releaseDate).format("DD/MM/YYYY")
-                : "Không rõ"}
-            </span>
-            <span>
-              Tác giả:{" "}
-              {songInfo?.composers?.map((item: any) => item?.name).join(", ")}
-            </span>
-            <span>
-              Thể loại:{" "}
-              {songInfo?.genres?.map((item: any) => item?.name).join(", ")}
-            </span>
-            <span>
-              Nghệ sĩ:{" "}
-              {songInfo?.artists?.map((item: any) => item?.name).join(", ")}
-            </span>
-            <div className="flex flex-row">
-              <div className="flex flex-row  items-center mr-2 gap-x-1">
-                <Heart size="18" color="oklch(var(--bc))" variant="Bold" />
-                <span style={{ color: " oklch(var(--bc))" }}>
-                  {formatNumber(songInfo?.like ?? 0)}
-                </span>
-              </div>
-              <div className="flex flex-row  items-center gap-x-1">
-                <Headphone
-                  size="18"
-                  color={"oklch(var(--bc))"}
-                  variant="Bold"
-                />
-                <span style={{ color: "oklch(var(--bc))" }}>
-                  {formatNumber(songInfo?.listen ?? 0)}
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
+                <figure className="relative">
+                  <div className="absolute top-4 left-4 badge badge-primary">
+                    Giới thiệu về nghệ sĩ
+                  </div>
+                  <img
+                    src={artist?.thumbnailM}
+                    alt=""
+                    className="w-full object-cover brightness-50 hover:brightness-75 transition-all duration-500"
+                    style={{ aspectRatio: "4/3" }}
+                  />
+                </figure>
+                <div className="card-body">
+                  <Link
+                    to={`/artist/${artist?.alias}`}
+                    className="card-title link link-hover hover:text-primary transition-colors"
+                  >
+                    {artist?.name}
+                  </Link>
+                  <div className="stats stats-vertical shadow bg-base-200">
+                    <div className="stat">
+                      <div className="stat-title">Ngày sinh</div>
+                      <div className="stat-value text-lg">
+                        {artist?.birthday || "Không rõ"}
+                      </div>
+                    </div>
+                    <div className="stat">
+                      <div className="stat-title">Người theo dõi</div>
+                      <div className="stat-value text-lg">
+                        {formatNumber(artist?.follow)}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
-        <div className="relative mt-4 mx-2 bg-base-300 flex flex-col px-4 rounded-lg py-2">
-          <span className="font-semibold">Tiếp theo trong danh sách chờ</span>
-          <div className="flex flex-row items-center gap-2 mt-1 group cursor-pointer">
-            <div className="relative w-12 h-12">
-              <img
-                src={
-                  currentSongIndex === playlist.songs.length - 1
-                    ? queue?.[0]?.thumbnailM
-                    : queue?.[currentSongIndex + 1]?.thumbnailM
-                }
-                alt=""
-                className="w-full h-full rounded-lg group-hover:brightness-50"
-              />
-              <div
-                className="absolute top-0 left-0 w-full h-full  justify-center items-center hidden group-hover:flex flex-1"
-                onClick={() =>
-                  handlePlaySong(
-                    currentSongIndex === playlist.songs.length - 1
-                      ? queue?.[0]
-                      : queue[currentSongIndex + 1],
-                    playlist
-                  )
-                }
-              >
-                <BsFillPlayFill />
+            <motion.div
+              className="card bg-base-300 shadow-xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.4 }}
+            >
+              <div className="card-body">
+                <div className="stats stats-vertical shadow bg-base-200">
+                  <div className="stat">
+                    <div className="stat-title">Ngày phát hành</div>
+                    <div className="stat-value text-lg">
+                      {songInfo?.releaseDate
+                        ? dayjs.unix(songInfo?.releaseDate).format("DD/MM/YYYY")
+                        : "Không rõ"}
+                    </div>
+                  </div>
+                  <div className="stat">
+                    <div className="stat-title">Tác giả</div>
+                    <div className="stat-value text-lg">
+                      {songInfo?.composers
+                        ?.map((item: any) => item?.name)
+                        .join(", ") || "Không rõ"}
+                    </div>
+                  </div>
+                  <div className="stat">
+                    <div className="stat-title">Thể loại</div>
+                    <div className="stat-value text-lg">
+                      {songInfo?.genres
+                        ?.map((item: any) => item?.name)
+                        .join(", ") || "Không rõ"}
+                    </div>
+                  </div>
+                  <div className="stat">
+                    <div className="stat-title">Nghệ sĩ</div>
+                    <div className="stat-value text-lg">
+                      {songInfo?.artists
+                        ?.map((item: any) => item?.name)
+                        .join(", ")}
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-4 mt-4">
+                  <div className="badge badge-lg gap-2 bg-base-200">
+                    <Heart size="18" variant="Bold" className="text-red-500" />
+                    {formatNumber(songInfo?.like ?? 0)}
+                  </div>
+                  <div className="badge badge-lg gap-2 bg-base-200">
+                    <Headphone
+                      size="18"
+                      variant="Bold"
+                      className="text-primary"
+                    />
+                    {formatNumber(songInfo?.listen ?? 0)}
+                  </div>
+                </div>
               </div>
-            </div>
-            <div className="flex flex-col flex-1">
-              <span className="line-clamp-1">
-                {currentSongIndex === playlist.songs.length - 1
-                  ? queue?.[0]?.title
-                  : queue?.[currentSongIndex + 1]?.title}
-              </span>
-              <span className="line-clamp-1">
-                {currentSongIndex === playlist.songs.length - 1
-                  ? queue?.[0]?.artistsNames
-                  : queue?.[currentSongIndex + 1]?.artistsNames}
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </motion.div>
+            </motion.div>
+
+            <motion.div
+              className="card bg-base-300 shadow-xl"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <div className="card-body">
+                <h2 className="card-title">Tiếp theo trong danh sách chờ</h2>
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  className="flex items-center gap-4 cursor-pointer hover:bg-base-200 p-2 rounded-lg transition-all"
+                  onClick={() => handlePlaySong(nextSong, playlist)}
+                >
+                  <div className="avatar">
+                    <div className="w-12 h-12 rounded-lg relative group overflow-hidden">
+                      <img
+                        src={nextSong?.thumbnailM}
+                        alt=""
+                        className="group-hover:scale-110 group-hover:brightness-50 transition-all duration-300"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <BsFillPlayFill className="text-2xl" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold truncate hover:text-primary transition-colors">
+                      {nextSong?.title}
+                    </p>
+                    <p className="text-base-content/70 truncate">
+                      {nextSong?.artistsNames}
+                    </p>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 
