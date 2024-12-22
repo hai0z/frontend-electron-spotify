@@ -4,6 +4,8 @@ import { YoutubeSearchResponse } from "../../../types/ytSearchResponse";
 import { Album } from "../../../types/ZingSong";
 import { Result } from "../../../types/ytSearchResponse";
 import useTrackPlayer from "../../hooks/useTrackPlayer";
+import { useTrackPlayerStore } from "../../store/TrackPlayerStore";
+import { BsFillPauseFill, BsFillPlayFill } from "react-icons/bs";
 
 export function convertYoutubeToZingSongRelated(content: any) {
   return {
@@ -70,15 +72,9 @@ export function convertYoutubeToZingSong(content: Result) {
   };
 }
 
-const getRelatedYoutubeSong = async (songId: string) => {
-  const relatedSong = await axios.get(
-    `http://localhost:5151/api/youtube/related?videoId=${songId}`
-  );
-  return relatedSong.data;
-};
-
 const YoutubeHome = () => {
   const { handlePlaySong } = useTrackPlayer();
+  const { currentSong, isPlaying } = useTrackPlayerStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<YoutubeSearchResponse>(
     {} as YoutubeSearchResponse
@@ -137,16 +133,17 @@ const YoutubeHome = () => {
     if (!searchQuery.trim()) return;
     setLoading(true);
     setShowSuggestions(false);
+
     try {
       const response = await axios.get(
         `http://localhost:5151/api/youtube/search?q=${searchQuery}`
       );
       setSearchResults(response.data);
-      setIsSearched(true);
     } catch (error) {
       console.error("Error searching YouTube:", error);
     } finally {
       setLoading(false);
+      setIsSearched(true);
     }
   };
 
@@ -157,14 +154,14 @@ const YoutubeHome = () => {
   };
 
   return (
-    <div className="w-full bg-base-200 overflow-y-scroll pb-20">
+    <div className="w-full bg-base-200 overflow-y-scroll pb-20 mx-2">
       <div className="container mx-auto  max-w-7xl">
         <div className="flex flex-col items-center mb-16 sticky top-0 z-30 bg-base-200 backdrop-blur-xl py-6">
           <div className="flex items-center gap-4 mb-8">
-            <h1 className="text-4xl font-bold text-red-600">YouTube Music</h1>
+            <h1 className="text-4xl font-bold text-primary">YouTube Music</h1>
           </div>
 
-          <div className="w-full max-w-4xl relative">
+          <div className="w-full max-w-4xl relative px-4">
             <div className="relative flex items-center">
               <input
                 onKeyDown={(e) => {
@@ -179,7 +176,7 @@ const YoutubeHome = () => {
                 onFocus={() =>
                   suggestions.length > 0 && setShowSuggestions(true)
                 }
-                className="input input-bordered w-full pl-12 pr-12 h-16 text-lg bg-base-100/40 backdrop-blur-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 rounded-full shadow-xl hover:shadow-2xl"
+                className="input input-bordered w-full pl-12 pr-12 h-14 text-lg bg-base-100/40 backdrop-blur-xl focus:outline-none focus:ring-2 focus:ring-primary transition-all duration-300 rounded-full shadow-xl hover:shadow-2xl"
               />
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -196,19 +193,8 @@ const YoutubeHome = () => {
                 />
               </svg>
 
-              {searchQuery && (
-                <button
-                  className="absolute right-20 text-base-content/50 hover:text-base-content transition-colors duration-200"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSuggestions([]);
-                    setShowSuggestions(false);
-                  }}
-                ></button>
-              )}
-
               <button
-                className="btn btn-primary h-16 px-8 ml-4 text-lg font-medium transition-all duration-300 rounded-full shadow-lg hover:shadow-primary/30 hover:scale-105 active:scale-95 disabled:opacity-70"
+                className="btn btn-secondary h-14 px-8 ml-4 text-lg font-medium transition-all duration-300 rounded-full shadow-lg hover:shadow-primary/30 hover:scale-105 active:scale-95 disabled:opacity-70"
                 onClick={() => handleSearch(searchQuery)}
                 disabled={loading}
               >
@@ -263,17 +249,17 @@ const YoutubeHome = () => {
         </div>
 
         {searchResults.results && searchResults.results.length > 0 ? (
-          <div className="grid grid-cols-1 2xl:grid-cols-2 gap-6 px-4">
+          <div className="grid grid-cols-1 2xl:grid-cols-2 gap-2 px-4">
             {searchResults.results
               .filter((result) => result.type === "Video")
               .map((result) => {
                 return (
                   <div
                     key={result.id}
-                    className="group bg-base-100/30 backdrop-blur-sm rounded-2xl hover:bg-base-100/40 transition-all duration-300 overflow-hidden  border border-base-300/50 "
+                    className="group  backdrop-blur-sm rounded-2xl  transition-all duration-300 overflow-hidden  border border-base-300/50 "
                   >
-                    <div className="flex items-center p-4 gap-4">
-                      <div className="relative aspect-square w-32 overflow-hidden">
+                    <div className="flex items-center px-4  gap-4">
+                      <div className="relative aspect-square w-48 overflow-hidden">
                         <img
                           src={result.thumbnails?.[0]?.url}
                           alt={result.title.text}
@@ -281,38 +267,33 @@ const YoutubeHome = () => {
                         />
                         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                           <button
-                            onClick={async () => {
-                              const relatedSong = await getRelatedYoutubeSong(
-                                result.id!
-                              );
+                            onClick={() => {
                               handlePlaySong(convertYoutubeToZingSong(result), {
                                 encodeId: result.id!,
                                 title: result.title.text,
-                                songs: [
-                                  convertYoutubeToZingSong(result),
-                                  ...relatedSong.contents[0].contents.map(
-                                    (song: any) =>
-                                      convertYoutubeToZingSongRelated(song)
-                                  ),
-                                ],
+                                songs: [convertYoutubeToZingSong(result)],
                               });
                             }}
                             className="w-14 h-14 rounded-full bg-primary flex items-center justify-center transform hover:scale-110 transition-transform shadow-lg"
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              viewBox="0 0 24 24"
-                              fill="currentColor"
-                              className="w-8 h-8 text-white ml-1"
-                            >
-                              <path d="M8 5v14l11-7z" />
-                            </svg>
+                            {isPlaying &&
+                            currentSong?.encodeId === result.id ? (
+                              <BsFillPauseFill className="text-2xl text-primary-content" />
+                            ) : (
+                              <BsFillPlayFill className="text-2xl text-primary-content" />
+                            )}
                           </button>
                         </div>
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <h3 className="text-xl font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2">
+                        <h3
+                          className={`text-xl font-bold mb-2 group-hover:text-primary transition-colors line-clamp-2 ${
+                            currentSong?.encodeId === result.id
+                              ? "text-primary"
+                              : ""
+                          }`}
+                        >
                           {result.title.text}
                         </h3>
                         <p className="text-base-content/60 truncate mb-3 hover:text-primary/80 transition-colors">
@@ -386,8 +367,8 @@ const YoutubeHome = () => {
               })}
           </div>
         ) : (
-          <div className="text-center  bg-base-200/30 backdrop-blur-md justify-center items-center flex flex-col  ">
-            <div className="w-32 h-32 rounded-full bg-base-300/30 flex items-center justify-center mb-8">
+          <div className="text-center  bg-base-200 backdrop-blur-md justify-center items-center flex flex-col mx-6 ">
+            <div className="w-32 h-32 rounded-full bg-base-300 flex items-center justify-center mb-8">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="h-16 w-16 text-primary/50"

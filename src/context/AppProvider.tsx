@@ -6,6 +6,7 @@ import { useAuth } from "./AuthProvider";
 import { useContextMenu } from "react-contexify";
 import { useTrackPlayerStore } from "../store/TrackPlayerStore";
 import axios from "axios";
+import { convertYoutubeToZingSongRelated } from "../page/youtube/Home";
 export const MENU_ID = "TRACK_CONTEXT_MENU";
 interface IAppContext {
   currentTime: number;
@@ -23,11 +24,23 @@ const getYoutubeAudioUrl = async (songId: string) => {
   );
   return audioUrl.data;
 };
-
+const getRelatedYoutubeSong = async (songId: string) => {
+  const relatedSong = await axios.get(
+    `http://localhost:5151/api/youtube/related?videoId=${songId}`
+  );
+  return relatedSong.data;
+};
 export const AppContext = React.createContext<IAppContext>({} as IAppContext);
 const AppProvider = ({ children }: { children: React.ReactNode }) => {
-  const { currentSong, setCurrentSong, setIsPlaying, setLyric } =
-    useTrackPlayerStore();
+  const {
+    currentSong,
+    setCurrentSong,
+    setIsPlaying,
+    setLyric,
+    setQueue,
+    playlist,
+    setPlaylist,
+  } = useTrackPlayerStore();
 
   const { isLoaded, theme } = useAppSettingStore();
 
@@ -98,6 +111,25 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, [currentSong?.encodeId]);
 
+  useEffect(() => {
+    getRelatedYoutubeSong(currentSong?.encodeId).then((relatedSong) => {
+      setQueue([
+        currentSong,
+        ...relatedSong.contents[0].contents.map((song: any) =>
+          convertYoutubeToZingSongRelated(song)
+        ),
+      ]);
+      setPlaylist({
+        ...playlist,
+        songs: [
+          currentSong,
+          ...relatedSong.contents[0].contents.map((song: any) =>
+            convertYoutubeToZingSongRelated(song)
+          ),
+        ],
+      });
+    });
+  }, [playlist?.encodeId]);
   return (
     <AppContext.Provider
       value={{

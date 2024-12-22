@@ -7,7 +7,6 @@ import {
   useState,
 } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import getThumbnail from "../utils/getThumnail";
 import { AppContext } from "../context/AppProvider";
 import caculateTime from "../utils/caculateTime";
 import { TbMicrophone2 } from "react-icons/tb";
@@ -151,10 +150,7 @@ const FullScreenMode = () => {
           transition={{ duration: 1 }}
           className="absolute top-0 left-0 w-[100%] h-[100vh] bg-base-200"
           style={{
-            backgroundImage: `url(${getThumbnail(
-              currentSong?.thumbnail,
-              720
-            )})`,
+            backgroundImage: `url(${currentSong?.thumbnail})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             backgroundRepeat: "no-repeat",
@@ -205,7 +201,7 @@ const FullScreenMode = () => {
                 }}
               >
                 <img
-                  src={getThumbnail(currentSong?.thumbnail) as string}
+                  src={currentSong?.thumbnail}
                   className="w-16 h-16 object-cover"
                   alt="logo"
                 />
@@ -339,7 +335,7 @@ const FullScreenMode = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.5 }}
-                  src={getThumbnail(currentSong?.thumbnailM) as string}
+                  src={currentSong?.thumbnailM as string}
                   className="w-80 h-80 rounded-xl"
                 />
                 <div className="flex flex-col justify-end gap-y-2">
@@ -435,7 +431,7 @@ const FullScreenMode = () => {
               transition: "opacity 1s",
             }}
           >
-            <div className="flex flex-1 bg-blue-500 opacity-0">abc</div>
+            <div className="flex flex-1 bg-blue-500 opacity-0"></div>
             <div className="flex flex-row items-center mt-1 gap-4 flex-1  justify-center">
               <div
                 className="rounded-full flex justify-center items-center cursor-pointer"

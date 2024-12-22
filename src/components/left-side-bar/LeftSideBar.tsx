@@ -95,7 +95,7 @@ const LeftSideBar = () => {
         minWidth: isCollapseLibrary ? 80 : 350,
       }}
     >
-      <motion.div className="rounded-lg bg-base-200/80 backdrop-blur-md h-[15%] flex flex-col justify-between shadow-lg">
+      <motion.div className="rounded-lg bg-base-200 backdrop-blur-md h-[15%] flex flex-col justify-between ">
         <Link
           className="flex-row flex items-center flex-1 px-4 transition-all duration-200 hover:bg-base-300/50 rounded-t-lg"
           to={"/"}
@@ -176,7 +176,7 @@ const LeftSideBar = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="flex flex-row sticky w-full top-0 z-[999] bg-base-200 backdrop-blur-md px-4 py-4">
+        <div className="flex flex-row sticky w-full top-0 z-[999] bg-base-200 backdrop-blur-md px-4 py-4 rounded-lg">
           <div className="flex flex-row items-center gap-x-2 justify-between w-full">
             <motion.div
               onClick={() => setIsCollapseLibrary(!isCollapseLibrary)}

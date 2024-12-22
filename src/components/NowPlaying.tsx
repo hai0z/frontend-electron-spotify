@@ -65,10 +65,12 @@ const NowPlaying = () => {
             <div className="flex-1">
               <Link
                 to={playlist?.link!}
-                className="btn btn-ghost gap-2 text-lg font-bold"
+                className="gap-2 text-lg font-bold w-full flex flex-row items-center"
               >
                 <MusicCircle variant="Bold" />
-                {playlist?.title}
+                <p className="text-lg font-bold line-clamp-2">
+                  {playlist?.title}
+                </p>
               </Link>
             </div>
             <div className="flex-none">
