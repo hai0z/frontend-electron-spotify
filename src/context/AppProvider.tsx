@@ -78,7 +78,9 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   useEffect(() => {
-    saveToHistory(currentSong);
+    if (currentSong?.type !== "youtubeSong") {
+      saveToHistory(currentSong);
+    }
   }, [currentSong?.encodeId]);
 
   useEffect(() => {
@@ -112,23 +114,25 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   }, [currentSong?.encodeId]);
 
   useEffect(() => {
-    getRelatedYoutubeSong(currentSong?.encodeId).then((relatedSong) => {
-      setQueue([
-        currentSong,
-        ...relatedSong.contents[0].contents.map((song: any) =>
-          convertYoutubeToZingSongRelated(song)
-        ),
-      ]);
-      setPlaylist({
-        ...playlist,
-        songs: [
+    if (currentSong?.type === "youtubeSong") {
+      getRelatedYoutubeSong(currentSong?.encodeId).then((relatedSong) => {
+        setQueue([
           currentSong,
           ...relatedSong.contents[0].contents.map((song: any) =>
             convertYoutubeToZingSongRelated(song)
           ),
-        ],
+        ]);
+        setPlaylist({
+          ...playlist,
+          songs: [
+            currentSong,
+            ...relatedSong.contents[0].contents.map((song: any) =>
+              convertYoutubeToZingSongRelated(song)
+            ),
+          ],
+        });
       });
-    });
+    }
   }, [playlist?.encodeId]);
   return (
     <AppContext.Provider
