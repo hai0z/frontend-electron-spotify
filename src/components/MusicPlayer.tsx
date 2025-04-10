@@ -79,6 +79,7 @@ function Player() {
   }, [userData]);
 
   const { youtubeUrlLoading } = useContext(AppContext);
+
   return (
     <div className="w-full bg-gradient-to-b from-base-300 to-base-200 h-24 absolute bottom-0 items-center flex flex-row justify-between px-6 z-50 shadow-lg">
       <div className="flex flex-row items-center flex-1 gap-4">

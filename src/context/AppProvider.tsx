@@ -55,8 +55,6 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   function displayMenu(e: any) {
-    // put whatever custom logic you need
-    // you can even decide to not display the Menu
     show({
       event: e,
     });
@@ -107,7 +105,8 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       getYoutubeAudioUrl(currentSong?.encodeId).then((audioUrl) => {
-        setCurrentSong({ ...currentSong, url: audioUrl });
+        console.log(audioUrl);
+        setCurrentSong({ ...currentSong, url: audioUrl.url });
         setYoutubeUrlLoading(false);
       });
     }
