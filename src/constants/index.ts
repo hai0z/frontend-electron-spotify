@@ -16,3 +16,16 @@ export const darkThemes = [
   { name: "coffee" },
   { name: "dim" },
 ];
+
+export const lightThemes = [
+  { name: "light" },
+  { name: "pastel" },
+  { name: "retro" },
+  { name: "aqua" },
+  { name: "lofi" },
+  { name: "cmyk" },
+  { name: "autumn" },
+  { name: "lemonade" },
+  { name: "night" },
+  { name: "wireframe" },
+];

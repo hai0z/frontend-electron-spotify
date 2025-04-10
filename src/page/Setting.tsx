@@ -1,5 +1,5 @@
 import Header from "../components/Header";
-import { darkThemes } from "../constants";
+import { darkThemes, lightThemes } from "../constants";
 import { useAppSettingStore } from "../store/AppSettingStore";
 const Setting = () => {
   const theme = useAppSettingStore((state) => state.theme);
@@ -30,6 +30,30 @@ const Setting = () => {
             <div className="">
               <div className="flex flex-row flex-wrap gap-4 mt-2">
                 {darkThemes.map((t) => {
+                  return (
+                    <div
+                      data-theme={t.name}
+                      className="flex gap-2 bg-transparent"
+                      key={t.name}
+                    >
+                      <input
+                        onChange={() => handleChangeTheme(t.name)}
+                        type="radio"
+                        name="radio-1"
+                        className="radio radio-primary md:tooltip hover:bg-primarys"
+                        data-tip={t.name}
+                        checked={theme === t.name}
+                      />
+                      <p className={"block md:hidden"}>{t.name}</p>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="divider"></div>
+
+              <div className="flex flex-row flex-wrap gap-4 mt-2">
+                {lightThemes.map((t) => {
                   return (
                     <div
                       data-theme={t.name}
