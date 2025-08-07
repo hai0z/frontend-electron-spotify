@@ -125,8 +125,8 @@ const Queue = () => {
                 <BsFillPlayFill color="white" />
               </div>
               <img
-                src={track.thumbnail}
-                alt={track.title}
+                src={track.thumbnailM}
+                alt={track.thumbnailM}
                 width={48}
                 height={48}
                 className="rounded-lg object-cover"

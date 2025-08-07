@@ -238,7 +238,7 @@ const PlaylistPage = () => {
         style={{
           background: `linear-gradient(${gradientColor}70, transparent)`,
         }}
-      ></div>
+      />
       <div className="-mt-64 pt-6">
         <div className="flex flex-row items-center  justify-between">
           <div className="flex flex-row items-center gap-4">

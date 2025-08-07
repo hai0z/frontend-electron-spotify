@@ -40,7 +40,7 @@ const LyricPage = () => {
         animate={{ opacity: 1 }}
         transition={{ duration: 1.5, ease: "easeInOut" }}
         initial={{ opacity: 0 }}
-        className="absolute top-0 left-0 w-full h-full bg-gradient-to-b from-base-200 to-base-300"
+        className="absolute top-0 left-0 w-full h-full animate-spin2"
         style={{
           backgroundImage: `url(${getThumbnail(currentSong?.thumbnail)})`,
           backgroundSize: "cover",
@@ -69,7 +69,7 @@ const LyricPage = () => {
                     <motion.div
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
+                      transition={{ delay: index < 10 ? index * 0.05 : 0.5 }}
                       id={`line-${index}`}
                       key={index}
                       className={`mx-0 px-6 rounded-xl transition-all duration-300 box-border py-4 ${

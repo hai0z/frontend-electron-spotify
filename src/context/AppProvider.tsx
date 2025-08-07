@@ -105,13 +105,13 @@ const AppProvider = ({ children }: { children: React.ReactNode }) => {
       }
 
       getYoutubeAudioUrl(currentSong?.encodeId).then((audioUrl) => {
-        console.log(audioUrl);
         setCurrentSong({ ...currentSong, url: audioUrl.url });
         setYoutubeUrlLoading(false);
       });
     }
   }, [currentSong?.encodeId]);
 
+  console.log(currentSong);
   useEffect(() => {
     if (currentSong?.type === "youtubeSong") {
       getRelatedYoutubeSong(currentSong?.encodeId).then((relatedSong) => {

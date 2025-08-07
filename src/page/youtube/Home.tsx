@@ -19,14 +19,8 @@ export function convertYoutubeToZingSongRelated(content: any) {
       content.authors?.map((author: any) => author.name).join(", ") || "",
     artists: [],
     isWorldWide: true,
-    thumbnailM: content.thumbnail?.contents?.[0]?.url.replace(
-      "w120-h120",
-      "w720-h720"
-    ),
-    thumbnail: content.thumbnail?.contents?.[0]?.url.replace(
-      "w120-h120",
-      "w720-h720"
-    ),
+    thumbnailM: content.thumbnail?.contents?.[0]?.url,
+    thumbnail: content.thumbnail?.contents?.[0]?.url,
     duration: content.duration?.seconds || 0,
     zingChoice: false,
     isPrivate: false,

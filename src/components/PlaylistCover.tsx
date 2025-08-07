@@ -38,16 +38,7 @@ const Cover: React.FC<coverProps> = ({
             onMouseOver={() => setCoverHover(true)}
             onMouseOut={() => setCoverHover(false)}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="absolute bottom-0 w-full p-4">
-              <h3 className="text-white font-bold truncate">{title}</h3>
-              {sortDescription && (
-                <p className="text-white/80 text-sm truncate">
-                  {sortDescription}
-                </p>
-              )}
-            </div>
-          </div>
+
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="w-14 h-14 bg-primary rounded-full flex items-center justify-center scale-0 group-hover:scale-100 transition-transform duration-300 hover:bg-primary-focus">
               <BsFillPlayFill size={28} className="text-white ml-1" />

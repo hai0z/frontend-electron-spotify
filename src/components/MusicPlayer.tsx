@@ -94,11 +94,8 @@ function Player() {
             <img
               src={currentSong?.thumbnailM}
               alt=""
-              className="h-16 w-16 rounded-xl shadow-md transition-transform group-hover:scale-105 object-contain"
+              className="h-16 w-16 rounded-xl shadow-md transition-transform group-hover:scale-105 object-cover"
             />
-            <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 rounded-xl transition-opacity flex items-center justify-center">
-              <BsFillPlayFill className="text-3xl text-white" />
-            </div>
           </motion.div>
         )}
         <div className="flex flex-col w-60">

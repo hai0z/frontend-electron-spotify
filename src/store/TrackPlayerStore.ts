@@ -1,10 +1,21 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
+export interface IWord {
+  startTime: number;
+  endTime: number;
+  data: string;
+}
+
+export interface ISentence {
+  words: IWord[];
+}
+
 export interface ILyric {
   startTime: number;
   endTime: number;
   data: string;
+  sentences?: ISentence[];
 }
 interface TrackPlayerState {
   isPlaying: boolean;

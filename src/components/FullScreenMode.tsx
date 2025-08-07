@@ -148,7 +148,7 @@ const FullScreenMode = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1 }}
-          className="absolute top-0 left-0 w-[100%] h-[100vh] bg-base-200"
+          className="absolute top-0 left-0 w-[100vw] h-[100vw] bg-base-200 animate-spin2"
           style={{
             backgroundImage: `url(${currentSong?.thumbnail})`,
             backgroundSize: "cover",
